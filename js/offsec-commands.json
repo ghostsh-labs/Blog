@@ -1,0 +1,374 @@
+[
+  {
+    "id": "subdomain",
+    "title": "Subdomain Enumeration",
+    "commands": [
+      {
+        "id": "subfinder-basic",
+        "title": "Basic Subdomain Discovery",
+        "description": "Discovers subdomains using subfinder with recursive enumeration and saves results to a file.",
+        "command": "subfinder -d example.com -all -recursive > subexample.com.txt"
+      },
+      {
+        "id": "httpx-filter",
+        "title": "Live Subdomain Filtering",
+        "description": "Filters discovered subdomains using httpx and saves the alive ones to a file.",
+        "command": "cat subexample.com.txt | httpx-toolkit -ports 80,443,8080,8000,8888 -threads 200 > subexample.coms_alive.txt"
+      },
+      {
+        "id": "subzy-check",
+        "title": "Subdomain Takeover Check",
+        "description": "Checks for subdomain takeover vulnerabilities using subzy.",
+        "command": "subzy run --targets subexample.coms.txt --concurrency 100 --hide_fails --verify_ssl"
+      }
+    ]
+  },
+  {
+    "id": "urls",
+    "title": "URL Collection",
+    "commands": [
+      {
+        "id": "katana-passive",
+        "title": "Passive URL Collection",
+        "description": "Collects URLs from various sources and saves them to a file.",
+        "command": "katana -u subexample.coms_alive.txt -d 5 -ps -pss waybackarchive,commoncrawl,alienvault -kf -jc -fx -ef woff,css,png,svg,jpg,woff2,jpeg,gif,svg -o allurls.txt"
+      },
+      {
+        "id": "advanced-urls",
+        "title": "Advanced URL Fetching",
+        "description": "Collects URLs from various sources and saves them to a file.",
+        "command": "echo example.com | katana -d 5 -ps -pss waybackarchive,commoncrawl,alienvault -f qurl | urldedupe >output.txtkatana -u https://example.com -d 5 | grep '=' | urldedupe | anew output.txtcat output.txt | sed 's/=.*/=/' >final.txt"
+      },
+      {
+        "id": "gau-urls",
+        "title": "GAU URL Collection",
+        "description": "Collects URLs using GAU and saves them to a file.",
+        "command": "echo example.com | gau --mc 200 | urldedupe >urls.txtcat urls.txt | grep -E \".php|.asp|.aspx|.jspx|.jsp\" | grep '=' | sort > output.txtcat output.txt | sed 's/=.*/=/' >final.txt"
+      }
+    ]
+  },
+  {
+    "id": "sensitive",
+    "title": "Sensitive Data Discovery",
+    "commands": [
+      {
+        "id": "sensitive-files",
+        "title": "Sensitive File Detection",
+        "description": "Detects sensitive files on the web server.",
+        "command": "cat allurls.txt | grep -E \"\\.xls|\\.xml|\\.xlsx|\\.json|\\.pdf|\\.sql|\\.doc|\\.docx|\\.pptx|\\.txt|\\.zip|\\.tar\\.gz|\\.tgz|\\.bak|\\.7z|\\.rar|\\.log|\\.cache|\\.secret|\\.db|\\.backup|\\.yml|\\.gz|\\.config|\\.csv|\\.yaml|\\.md|\\.md5\""
+      },
+      {
+        "id": "info-dork",
+        "title": "Information Disclosure Dork",
+        "description": "Searches for information disclosure vulnerabilities using a dork.",
+        "command": "site:*.example.com (ext:doc OR ext:docx OR ext:odt OR ext:pdf OR ext:rtf OR ext:ppt OR ext:pptx OR ext:csv OR ext:xls OR ext:xlsx OR ext:txt OR ext:xml OR ext:json OR ext:zip OR ext:rar OR ext:md OR ext:log OR ext:bak OR ext:conf OR ext:sql)"
+      },
+      {
+        "id": "git-detection",
+        "title": "Git Repository Detection",
+        "description": "Detects Git repositories on the web server.",
+        "command": "cat example.coms.txt | grep \"SUCCESS\" | gf urls | httpx-toolkit -sc -server -cl -path \"/.git/\" -mc 200 -location -ms \"Index of\" -probe"
+      },
+      {
+        "id": "info-disclosure",
+        "title": "Information Disclosure Scanner",
+        "description": "Checks for information disclosure vulnerabilities using a scanner.",
+        "command": "echo https://example.com | gau | grep -E \"\\.(xls|xml|xlsx|json|pdf|sql|doc|docx|pptx|txt|zip|tar\\.gz|tgz|bak|7z|rar|log|cache|secret|db|backup|yml|gz|config|csv|yaml|md|md5|tar|xz|7zip|p12|pem|key|crt|csr|sh|pl|py|java|class|jar|war|ear|sqlitedb|sqlite3|dbf|db3|accdb|mdb|sqlcipher|gitignore|env|ini|conf|properties|plist|cfg)$\""
+      },
+      {
+        "id": "s3-buckets",
+        "title": "AWS S3 Bucket Finder",
+        "description": "Searches for AWS S3 buckets associated with the target.",
+        "command": "s3scanner scan -d example.com"
+      },
+      {
+        "id": "api-keys",
+        "title": "API Key Finder",
+        "description": "Searches for exposed API keys and tokens in JavaScript files.",
+        "command": "cat allurls.txt | grep -E \"\\.js$\" | httpx-toolkit -mc 200 -content-type | grep -E \"application/javascript|text/javascript\" | cut -d' ' -f1 | xargs -I% curl -s % | grep -E \"(API_KEY|api_key|apikey|secret|token|password)\""
+      }
+    ]
+  },
+  {
+    "id": "xss",
+    "title": "XSS Testing",
+    "commands": [
+      {
+        "id": "xss-pipeline",
+        "title": "XSS Hunting Pipeline",
+        "description": "Collects XSS vulnerabilities using various tools and saves them to a file.",
+        "command": "echo https://example.com/ | gau | gf xss | uro | Gxss | kxss | tee xss_output.txt"
+      },
+      {
+        "id": "dalfox-xss",
+        "title": "XSS with Dalfox",
+        "description": "Uses Dalfox to scan for XSS vulnerabilities.",
+        "command": "cat xss_params.txt | dalfox pipe --blind https://your-collaborator-url --waf-bypass --silence"
+      },
+      {
+        "id": "stored-xss",
+        "title": "Stored XSS Finder",
+        "description": "Finds potential stored XSS vulnerabilities by scanning forms.",
+        "command": "cat urls.txt | grep -E \"(login|signup|register|forgot|password|reset)\" | httpx -silent | nuclei -t nuclei-templates/vulnerabilities/xss/ -severity critical,high"
+      },
+      {
+        "id": "dom-xss",
+        "title": "DOM XSS Detection",
+        "description": "Detects potential DOM-based XSS vulnerabilities.",
+        "command": "cat js_files.txt | Gxss -c 100 | sort -u | dalfox pipe -o dom_xss_results.txt"
+      }
+    ]
+  },
+  {
+    "id": "lfi",
+    "title": "LFI Testing",
+    "commands": [
+      {
+        "id": "lfi-method",
+        "title": "LFI Methodology",
+        "description": "Tests for Local File Inclusion (LFI) vulnerabilities using various methods.",
+        "command": "echo \"https://example.com/\" | gau | gf lfi | uro | sed 's/=.*/=/' | qsreplace \"FUZZ\" | sort -u | xargs -I{} ffuf -u {} -w payloads/lfi.txt -c -mr \"root:(x|\\*|\\$[^\\:]*):0:0:\" -v"
+      }
+    ]
+  },
+  {
+    "id": "cors",
+    "title": "CORS Testing",
+    "commands": [
+      {
+        "id": "cors-check",
+        "title": "Basic CORS Check",
+        "description": "Checks the Cross-Origin Resource Sharing (CORS) policy of a website.",
+        "command": "curl -H \"Origin: http://example.com\" -I https://example.com/wp-json/"
+      },
+      {
+        "id": "corscanner",
+        "title": "CORScanner",
+        "description": "Fast CORS misconfiguration scanner that helps identify potential CORS vulnerabilities.",
+        "command": "python3 CORScanner.py -u https://example.com -d -t 10"
+      },
+      {
+        "id": "cors-nuclei",
+        "title": "CORS Nuclei Scan",
+        "description": "Uses Nuclei to scan for CORS misconfigurations across multiple domains.",
+        "command": "cat example.coms.txt | httpx -silent | nuclei -t nuclei-templates/vulnerabilities/cors/ -o cors_results.txt"
+      },
+      {
+        "id": "cors-reflection",
+        "title": "CORS Origin Reflection Test",
+        "description": "Tests for origin reflection vulnerability in CORS configuration.",
+        "command": "curl -H \"Origin: https://evil.com\" -I https://example.com/api/data | grep -i \"access-control-allow-origin: https://evil.com\""
+      }
+    ]
+  },
+  {
+    "id": "wordpress",
+    "title": "WordPress Scanning",
+    "commands": [
+      {
+        "id": "wpscan",
+        "title": "Aggressive WordPress Scan",
+        "description": "Scans a WordPress website for vulnerabilities and saves the results to a file.",
+        "command": "wpscan --url https://example.com --disable-tls-checks --api-token YOUR_TOKEN -e at -e ap -e u --enumerate ap --plugins-detection aggressive --force"
+      }
+    ]
+  },
+  {
+    "id": "network",
+    "title": "Network Scanning",
+    "commands": [
+      {
+        "id": "naabu",
+        "title": "Naabu Scan",
+        "description": "Scans for open ports and services using Naabu.",
+        "command": "naabu -list ip.txt -c 50 -nmap-cli 'nmap -sV -SC' -o naabu-full.txt"
+      },
+      {
+        "id": "nmap",
+        "title": "Nmap Full Scan",
+        "description": "Performs a full port scan using Nmap.",
+        "command": "nmap -p- --min-rate 1000 -T4 -A example.com -oA fullscan"
+      },
+      {
+        "id": "masscan",
+        "title": "Masscan",
+        "description": "Scans for open ports and services using Masscan.",
+        "command": "masscan -p0-65535 example.com --rate 100000 -oG masscan-results.txt"
+      }
+    ]
+  },
+  {
+    "id": "web-recon",
+    "title": "Web Recon",
+    "commands": [
+      {
+        "id": "nmap-web-ports",
+        "title": "Nmap — Web Port Scan",
+        "description": "Fast scan of common web and service ports on a target host.",
+        "command": "nmap -sV -sC -p 80,443,8000,8080,8443,8888,3000,5000,9000 example.com -oA web-ports"
+      },
+      {
+        "id": "nmap-http-scripts",
+        "title": "Nmap — HTTP Enumeration Scripts",
+        "description": "Run HTTP-specific NSE scripts for titles, headers, methods, and tech fingerprinting.",
+        "command": "nmap -p 80,443 --script=http-title,http-headers,http-methods,http-server-header,http-enum -oA http-enum example.com"
+      },
+      {
+        "id": "nmap-ssl-scan",
+        "title": "Nmap — SSL/TLS Analysis",
+        "description": "Enumerate SSL ciphers, cert details, and known vulnerabilities on HTTPS.",
+        "command": "nmap -p 443 --script ssl-cert,ssl-enum-ciphers,ssl-heartbleed -oA ssl-scan example.com"
+      },
+      {
+        "id": "gobuster-dir",
+        "title": "Gobuster — Directory Brute Force",
+        "description": "Discover hidden directories and files on a web server.",
+        "command": "gobuster dir -u https://example.com -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-directories.txt -x php,html,js,txt,bak -t 50 -o gobuster-dirs.txt"
+      },
+      {
+        "id": "gobuster-vhost",
+        "title": "Gobuster — Vhost Discovery",
+        "description": "Brute force virtual hosts to find subdomains/sites on the same IP.",
+        "command": "gobuster vhost -u https://example.com -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt -t 50 -o gobuster-vhosts.txt"
+      },
+      {
+        "id": "gobuster-dns",
+        "title": "Gobuster — DNS Subdomain Enum",
+        "description": "Enumerate subdomains via DNS brute force.",
+        "command": "gobuster dns -d example.com -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -t 50 -o gobuster-dns.txt"
+      },
+      {
+        "id": "nuclei-single",
+        "title": "Nuclei — Single Target Scan",
+        "description": "Run all Nuclei templates against a single URL.",
+        "command": "nuclei -u https://example.com -o nuclei-single.txt"
+      },
+      {
+        "id": "nuclei-severity",
+        "title": "Nuclei — Critical & High Only",
+        "description": "Scan a target filtering to critical and high severity findings only.",
+        "command": "nuclei -u https://example.com -severity critical,high -o nuclei-critical.txt"
+      },
+      {
+        "id": "nuclei-tags",
+        "title": "Nuclei — Tagged Templates (CVE/Exposure)",
+        "description": "Run specific template tags — useful for focused CVE and misconfiguration hunts.",
+        "command": "nuclei -u https://example.com -tags cve,exposure,misconfig -o nuclei-tagged.txt"
+      },
+      {
+        "id": "nuclei-list",
+        "title": "Nuclei — Scan URL List",
+        "description": "Run Nuclei against a list of live URLs from recon output.",
+        "command": "cat alive-urls.txt | nuclei -t nuclei-templates/ -severity medium,high,critical -c 50 -o nuclei-results.txt"
+      },
+      {
+        "id": "web-recon-pipeline",
+        "title": "Web Recon Pipeline",
+        "description": "Full web recon chain — port scan, probe live hosts, directory brute, then Nuclei.",
+        "command": "nmap -sV -p 80,443,8080,8443 example.com -oG - | awk '/Status: Open/{print $2}' | httpx -silent -o alive.txt && gobuster dir -u https://example.com -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-directories.txt -q -o gobuster.txt && nuclei -l alive.txt -severity critical,high -o nuclei.txt"
+      },
+      {
+        "id": "httpx-nuclei",
+        "title": "Httpx → Nuclei Quick Sweep",
+        "description": "Probe subdomains for live web services then immediately scan with Nuclei.",
+        "command": "cat subexample.coms_alive.txt | httpx -silent -status-code -title -tech-detect -o alive.txt && nuclei -l alive.txt -severity critical,high,medium -c 40 -o nuclei-sweep.txt"
+      }
+    ]
+  },
+  {
+    "id": "parameters",
+    "title": "Parameter Discovery",
+    "commands": [
+      {
+        "id": "arjun-passive",
+        "title": "Arjun Passive",
+        "description": "Passively discovers parameters using Arjun.",
+        "command": "arjun -u https://example.com/endpoint.php -oT arjun_output.txt -t 10 --rate-limit 10 --passive -m GET,POST --headers \"User-Agent: Mozilla/5.0\""
+      },
+      {
+        "id": "arjun-wordlist",
+        "title": "Arjun Wordlist",
+        "description": "Uses Arjun to discover parameters using a custom wordlist.",
+        "command": "arjun -u https://example.com/endpoint.php -oT arjun_output.txt -m GET,POST -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt -t 10 --rate-limit 10 --headers \"User-Agent: Mozilla/5.0\""
+      }
+    ]
+  },
+  {
+    "id": "javascript",
+    "title": "JavaScript Analysis",
+    "commands": [
+      {
+        "id": "js-hunting",
+        "title": "JS File Hunting",
+        "description": "Collects JavaScript files from a website and analyzes them.",
+        "command": "echo example.com | katana -d 5 | grep -E \"\\.js$\" | nuclei -t /path/to/nuclei-templates/http/exposures/ -c 30"
+      },
+      {
+        "id": "js-analysis",
+        "title": "JS File Analysis",
+        "description": "Analyzes collected JavaScript files.",
+        "command": "cat alljs.txt | nuclei -t /path/to/nuclei-templates/http/exposures/"
+      }
+    ]
+  },
+  {
+    "id": "content-type",
+    "title": "Content Type Filtering",
+    "commands": [
+      {
+        "id": "content-check",
+        "title": "Content Type Check",
+        "description": "Checks the content type of URLs.",
+        "command": "echo example.com | gau | grep -Eo '(\\/[^\\/]+)\\.(php|asp|aspx|jsp|jsf|cfm|pl|perl|cgi|htm|html)$' | httpx -status-code -mc 200 -content-type | grep -E 'text/html|application/xhtml+xml'"
+      },
+      {
+        "id": "js-content",
+        "title": "JavaScript Content Check",
+        "description": "Checks for JavaScript content in URLs.",
+        "command": "echo example.com | gau | grep '\\.js-php-jsp-other extens$' | httpx -status-code -mc 200 -content-type | grep 'application/javascript'"
+      }
+    ]
+  },
+  {
+    "id": "shodan",
+    "title": "Shodan Dorks",
+    "commands": [
+      {
+        "id": "shodan-ssl",
+        "title": "SSL Certificate Search",
+        "description": "Searches for SSL certificates using Shodan.",
+        "command": "Ssl.cert.subject.CN:\"example.com\" 200"
+      }
+    ]
+  },
+  {
+    "id": "ffuf-request",
+    "title": "FFUF Request File Method",
+    "commands": [
+      {
+        "id": "ffuf-lfi",
+        "title": "LFI with Request File",
+        "description": "Uses FFUF to bruteforce LFI vulnerabilities using a request file.",
+        "command": "ffuf -request lfi -request-proto https -w /root/wordlists/offensive\\ payloads/LFI\\ payload.txt -c -mr \"root:\""
+      },
+      {
+        "id": "ffuf-xss",
+        "title": "XSS with Request File",
+        "description": "Uses FFUF to bruteforce XSS vulnerabilities using a request file.",
+        "command": "ffuf -request xss -request-proto https -w /root/wordlists/xss-payloads.txt -c -mr \"<script>alert('XSS')</script>\""
+      }
+    ]
+  },
+  {
+    "id": "advanced",
+    "title": "Advanced Techniques",
+    "commands": [
+      {
+        "id": "header-testing",
+        "title": "XSS/SSRF Header Testing",
+        "description": "Tests for XSS and SSRF vulnerabilities using various methods.",
+        "command": "cat example.coms.txt | assetfinder --subs-only| httprobe | while read url; do xss1=$(curl -s -L $url -H 'X-Forwarded-For: xss.yourburpcollabrotor'|grep xss) xss2=$(curl -s -L $url -H 'X-Forwarded-Host: xss.yourburpcollabrotor'|grep xss) xss3=$(curl -s -L $url -H 'Host: xss.yourburpcollabrotor'|grep xss) xss4=$(curl -s -L $url --request-target http://burpcollaborator/ --max-time 2); echo -e \"\\e[1;32m$url\\e[0m\"\"\\n\"\"Method[1] X-Forwarded-For: xss+ssrf => $xss1\"\"\\n\"\"Method[2] X-Forwarded-Host: xss+ssrf ==> $xss2\"\"\\n\"\"Method[3] Host: xss+ssrf ==> $xss3\"\"\\n\"\"Method[4] GET http://xss.yourburpcollabrotor HTTP/1.1 \"\"\\n\";done"
+      }
+    ]
+  }
+]

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOST — DFIR &amp; OffSec</title>
+    <meta name="description" content="GHOST — personal DFIR and offensive security blog, toolkit, and reference">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/ghost.css">
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="scanlines"></div>
+    <div class="particles-container"></div>
+
+    <div class="intro-container">
+        <div class="intro-content">
+            <div class="intro-ghost">GHOST</div>
+            <div class="intro-line"></div>
+            <div class="intro-sub">DFIR &amp; OffSec Operations</div>
+        </div>
+    </div>
+
+    <nav class="navbar" role="navigation">
+        <a href="index.html" class="logo" aria-label="GHOST">
+            <i class="fas fa-ghost"></i>
+            <span>GHOST</span>
+        </a>
+        <button class="menu-toggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-overlay"></div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Home</a>
+            <a href="toolkit.html">Toolkit</a>
+            <a href="artifacts.html">Artifacts</a>
+            <a href="writeups.html">Writeups</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero-section">
+            <h1 class="hero-title">GHOST</h1>
+            <p class="hero-subtitle">stand alone complex — digital forensics, incident response &amp; offensive security</p>
+            <p class="hero-desc">Notes, command references, and writeups from the field. Built for operators who do both sides of the house.</p>
+        </section>
+
+        <section class="quick-links">
+            <a href="toolkit.html" class="quick-link-card">
+                <i class="fas fa-terminal"></i>
+                <h3>Toolkit</h3>
+                <p>OffSec &amp; DFIR commands — nmap, gobuster, nuclei, volatility, and more</p>
+            </a>
+            <a href="artifacts.html" class="quick-link-card">
+                <i class="fas fa-fingerprint"></i>
+                <h3>Artifacts</h3>
+                <p>DFIR cheat sheet — Prefetch, ShellBags, AmCache, EVTX locations</p>
+            </a>
+            <a href="writeups.html" class="quick-link-card">
+                <i class="fas fa-pen-nib"></i>
+                <h3>Writeups</h3>
+                <p>Full blog posts — methodologies, walkthroughs, and lessons learned</p>
+            </a>
+        </section>
+
+        <section class="blog-section">
+            <div class="section-header">
+                <h2><i class="fas fa-rss"></i> Latest Writeups</h2>
+                <a href="writeups.html" class="view-all">View all <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="writeups-grid" id="blog-summaries"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p class="footer-text">
+            <span>GHOST</span> — dfir &amp; offsec operations
+        </p>
+    </footer>
+
+    <button id="scroll-to-top" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="js/writeups-data.js"></script>
+    <script src="js/ghost-common.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

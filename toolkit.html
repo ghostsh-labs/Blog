@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOST — DFIR &amp; OffSec Toolkit</title>
+    <meta name="description" content="Personal DFIR and offensive security command reference — ghost in the shell">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/ghost.css">
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="scanlines"></div>
+    <div class="particles-container"></div>
+
+    <nav class="navbar" role="navigation">
+        <a href="index.html" class="logo" aria-label="GHOST">
+            <i class="fas fa-ghost"></i>
+            <span>GHOST</span>
+        </a>
+        <button class="menu-toggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-overlay"></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="toolkit.html" class="active">Toolkit</a>
+            <a href="artifacts.html">Artifacts</a>
+            <a href="writeups.html">Writeups</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="search-container" id="commands">
+            <h1>GHOST TOOLKIT</h1>
+            <p class="subtitle">stand alone complex — dfir &amp; offensive security commands</p>
+
+            <form class="search-form" id="domain-form">
+                <input
+                    type="text"
+                    id="domain-input"
+                    class="search-input"
+                    placeholder="example.com — replace domain in OffSec commands"
+                    aria-label="Target domain"
+                >
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-crosshairs"></i> Set Target
+                </button>
+            </form>
+
+            <input
+                type="text"
+                id="search-input"
+                class="search-input"
+                placeholder="Search commands..."
+                aria-label="Search commands"
+                style="max-width: 700px; width: 100%;"
+            >
+        </section>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="offsec">
+                <i class="fas fa-crosshairs"></i> OFFSEC
+            </button>
+            <button class="tab-btn" data-tab="dfir">
+                <i class="fas fa-fingerprint"></i> DFIR
+            </button>
+            <button class="tab-btn" data-tab="tools">
+                <i class="fas fa-toolbox"></i> TOOLS
+            </button>
+        </div>
+
+        <nav class="section-nav" id="section-nav"></nav>
+
+        <div id="offsec-panel" class="panel active"></div>
+        <div id="dfir-panel" class="panel"></div>
+        <div id="tools-panel" class="panel">
+            <h2 class="tool-category">
+                <i class="fas fa-toolbox"></i> Reference Tools
+            </h2>
+            <div class="tools-ref-grid" id="tools-ref-grid"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p class="footer-text">
+            <span>GHOST</span> — personal security operations reference
+        </p>
+    </footer>
+
+    <div id="notification" class="notification" role="alert">
+        <i class="fas fa-check-circle"></i>
+        <span>Command copied</span>
+    </div>
+
+    <button id="scroll-to-top" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="js/data.js"></script>
+    <script src="js/ghost-common.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
