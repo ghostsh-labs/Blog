@@ -420,298 +420,222 @@ window.GHOST_DATA = {
   ],
   "dfir": [
     {
-      "id": "memory",
-      "title": "Memory Forensics",
-      "icon": "fa-memory",
-      "commands": [
-        {
-          "id": "vol3-info",
-          "title": "Volatility 3 \u2014 System Info",
-          "description": "Identify OS, kernel, and architecture from a memory dump.",
-          "command": "vol -f memory.dmp windows.info"
-        },
-        {
-          "id": "vol3-pslist",
-          "title": "Volatility 3 \u2014 Process List",
-          "description": "Enumerate running processes at time of capture.",
-          "command": "vol -f memory.dmp windows.pslist"
-        },
-        {
-          "id": "vol3-pstree",
-          "title": "Volatility 3 \u2014 Process Tree",
-          "description": "Visualize parent-child process relationships for anomaly detection.",
-          "command": "vol -f memory.dmp windows.pstree"
-        },
-        {
-          "id": "vol3-netscan",
-          "title": "Volatility 3 \u2014 Network Connections",
-          "description": "Extract active network connections and listening ports from memory.",
-          "command": "vol -f memory.dmp windows.netscan"
-        },
-        {
-          "id": "vol3-malfind",
-          "title": "Volatility 3 \u2014 Malware Detection",
-          "description": "Find injected code and suspicious memory regions.",
-          "command": "vol -f memory.dmp windows.malfind"
-        },
-        {
-          "id": "vol3-dumpfiles",
-          "title": "Volatility 3 \u2014 Dump Suspicious Files",
-          "description": "Extract files from process memory for further analysis.",
-          "command": "vol -f memory.dmp windows.dumpfiles --pid 1234 --dump-dir ./dumps/"
-        }
-      ]
-    },
-    {
-      "id": "disk",
-      "title": "Disk & File Forensics",
-      "icon": "fa-hard-drive",
-      "commands": [
-        {
-          "id": "fls-inode",
-          "title": "Sleuth Kit \u2014 List Deleted Files",
-          "description": "List deleted files by inode on an NTFS/ext image.",
-          "command": "fls -rd image.E01 | grep '(deleted)'"
-        },
-        {
-          "id": "icat-extract",
-          "title": "Sleuth Kit \u2014 Extract by Inode",
-          "description": "Carve a file from a disk image using its inode number.",
-          "command": "icat image.E01 128-128-4 > recovered_file.exe"
-        },
-        {
-          "id": "mmls-partitions",
-          "title": "Sleuth Kit \u2014 Partition Table",
-          "description": "Display partition layout of a forensic image.",
-          "command": "mmls image.E01"
-        },
-        {
-          "id": "bulk-extractor",
-          "title": "Bulk Extractor \u2014 Auto Carve",
-          "description": "Automatically extract emails, URLs, credit cards, and more.",
-          "command": "bulk_extractor -o bulk_out/ image.E01"
-        },
-        {
-          "id": "find-suspicious",
-          "title": "Find Suspicious Executables",
-          "description": "Locate recently modified executables in a mounted image.",
-          "command": "find /mnt/evidence -type f \\( -name '*.exe' -o -name '*.dll' -o -name '*.ps1' \\) -mtime -7"
-        }
-      ]
-    },
-    {
-      "id": "evtx",
-      "title": "Windows Event Logs",
-      "icon": "fa-scroll",
-      "commands": [
-        {
-          "id": "evtx-dump",
-          "title": "Export All EVTX Logs",
-          "description": "Export all Windows event logs to a review directory.",
-          "command": "wevtutil epl Security C:\\forensics\\Security.evtx & wevtutil epl System C:\\forensics\\System.evtx & wevtutil epl \"Microsoft-Windows-PowerShell/Operational\" C:\\forensics\\PS.evtx"
-        },
-        {
-          "id": "evtx-parse",
-          "title": "Parse EVTX with EvtxECmd",
-          "description": "Parse Security.evtx into CSV for timeline analysis.",
-          "command": "EvtxECmd.exe -f C:\\forensics\\Security.evtx --csv C:\\forensics\\output\\"
-        },
-        {
-          "id": "evtx-4624",
-          "title": "Hunt Successful Logons (4624)",
-          "description": "Filter Security log for successful authentication events.",
-          "command": "Get-WinEvent -FilterHashtable @{LogName='Security'; ID=4624} | Select TimeCreated, @{n='User';e={$_.Properties[5].Value}}, @{n='IP';e={$_.Properties[18].Value}}"
-        },
-        {
-          "id": "evtx-4688",
-          "title": "Hunt Process Creation (4688)",
-          "description": "Find process creation events \u2014 key for detecting execution.",
-          "command": "Get-WinEvent -FilterHashtable @{LogName='Security'; ID=4688} | Where-Object {$_.Message -match 'powershell|cmd|wscript'} | Select TimeCreated, Message"
-        },
-        {
-          "id": "chainsaw-hunt",
-          "title": "Chainsaw \u2014 Sigma Hunt",
-          "description": "Run Sigma rules against collected EVTX logs.",
-          "command": "chainsaw hunt C:\\forensics\\evtx\\ --sigma rules/ --mapping mappings/sigma-event-logs-all.yml -o results/"
-        }
-      ]
-    },
-    {
-      "id": "netforensics",
-      "title": "Network Forensics",
-      "icon": "fa-network-wired",
-      "commands": [
-        {
-          "id": "tshark-http",
-          "title": "Extract HTTP Hosts from PCAP",
-          "description": "Pull HTTP host headers from a packet capture.",
-          "command": "tshark -r capture.pcap -Y http.request -T fields -e http.host | sort -u"
-        },
-        {
-          "id": "tshark-dns",
-          "title": "Extract DNS Queries",
-          "description": "List all DNS queries \u2014 useful for C2 domain identification.",
-          "command": "tshark -r capture.pcap -Y dns.flags.response==0 -T fields -e dns.qry.name | sort -u"
-        },
-        {
-          "id": "tshark-follow",
-          "title": "Follow TCP Stream",
-          "description": "Reconstruct a TCP conversation from a PCAP.",
-          "command": "tshark -r capture.pcap -q -z follow,tcp,ascii,0"
-        },
-        {
-          "id": "zeek-conn",
-          "title": "Zeek \u2014 Connection Log Summary",
-          "description": "Summarize connection logs from Zeek output.",
-          "command": "cat conn.log | jq -r '[.ts, .id.orig_h, .id.resp_h, .id.resp_p, .proto] | @tsv' | sort -u"
-        },
-        {
-          "id": "suricata-alerts",
-          "title": "Suricata \u2014 Review Alerts",
-          "description": "Parse Suricata fast.log for triggered IDS rules.",
-          "command": "cat fast.log | grep -E 'ET |SURICATA' | awk '{print $NF}' | sort | uniq -c | sort -rn"
-        }
-      ]
-    },
-    {
-      "id": "timeline",
-      "title": "Timeline Analysis",
-      "icon": "fa-clock",
-      "commands": [
-        {
-          "id": "plaso-log2timeline",
-          "title": "Plaso \u2014 Create Timeline",
-          "description": "Generate a super timeline from a forensic image.",
-          "command": "log2timeline.py --storage-file timeline.plaso image.E01"
-        },
-        {
-          "id": "plaso-psort",
-          "title": "Plaso \u2014 Export Timeline",
-          "description": "Export timeline to CSV for review in Timeline Explorer.",
-          "command": "psort.py -o l2tcsv -w timeline.csv timeline.plaso"
-        },
-        {
-          "id": "mactime-bodyfile",
-          "title": "Sleuth Kit \u2014 Mactime Bodyfile",
-          "description": "Create a bodyfile for timeline generation with mactime.",
-          "command": "fls -r -m C: image.E01 > bodyfile.txt && mactime -b bodyfile.txt -d > timeline.txt"
-        },
-        {
-          "id": "kape-timeline",
-          "title": "KAPE \u2014 Targeted Collection",
-          "description": "Collect high-value forensic artifacts for rapid timeline building.",
-          "command": "kape.exe --tsource C: --tdest C:\\kape_out --target !SANS_Triage --mdest C:\\kape_out --module !EZParser"
-        }
-      ]
-    },
-    {
-      "id": "malware",
-      "title": "Malware Analysis",
-      "icon": "fa-biohazard",
-      "commands": [
-        {
-          "id": "yara-scan",
-          "title": "YARA \u2014 Scan Directory",
-          "description": "Scan files against a YARA rule set.",
-          "command": "yara -r rules/malware.yar /path/to/samples/"
-        },
-        {
-          "id": "strings-extract",
-          "title": "Extract Printable Strings",
-          "description": "Pull ASCII/Unicode strings from a suspicious binary.",
-          "command": "strings -el suspicious.exe | grep -iE 'http|password|cmd|powershell|registry'"
-        },
-        {
-          "id": "pe-header",
-          "title": "PE Header Analysis",
-          "description": "Inspect PE headers with pefile for anomalies.",
-          "command": "python3 -c \"import pefile; pe=pefile.PE('sample.exe'); print(pe.DOS_HEADER); print(pe.OPTIONAL_HEADER)\""
-        },
-        {
-          "id": "hash-file",
-          "title": "Hash Suspicious Files",
-          "description": "Generate SHA256 hashes for IOC reporting and threat intel lookup.",
-          "command": "sha256sum suspicious.exe | tee hashes.txt"
-        },
-        {
-          "id": "floss-strings",
-          "title": "FLOSS \u2014 Obfuscated Strings",
-          "description": "Extract obfuscated strings from malware using Mandiant FLOSS.",
-          "command": "floss --no-static-strings suspicious.exe > floss_output.txt"
-        }
-      ]
-    },
-    {
-      "id": "winir",
-      "title": "Windows IR Collection",
-      "icon": "fa-windows",
+      "id": "kape",
+      "title": "KAPE",
+      "order": 1,
+      "icon": "fa-box-archive",
+      "defaultOpen": true,
       "commands": [
         {
           "id": "kape-triage",
-          "title": "KAPE \u2014 SANS Triage",
-          "description": "Rapid triage collection using KAPE SANS targets.",
-          "command": "kape.exe --tsource C: --tdest \\\\share\\evidence --target !SANS_Triage"
+          "title": "SANS Triage Collection",
+          "description": "Rapid artifact collection using the !SANS_Triage target.",
+          "command": "kape.exe --tsource C: --tdest C:\\kape_out --target !SANS_Triage"
         },
         {
-          "id": "velociraptor",
-          "title": "Velociraptor \u2014 Live Collection",
-          "description": "Collect artifacts remotely via Velociraptor VQL.",
-          "command": "SELECT * FROM Artifact.Windows.System.Pslist()"
+          "id": "kape-triage-remote",
+          "title": "SANS Triage \u2192 Network Share",
+          "description": "Collect triage artifacts to a UNC path or external drive.",
+          "command": "kape.exe --tsource C: --tdest \\\\share\\evidence\\HOSTNAME --target !SANS_Triage"
         },
         {
-          "id": "autoruns",
-          "title": "Autoruns \u2014 Persistence Check",
-          "description": "Enumerate autorun locations for persistence mechanisms.",
-          "command": "autorunsc.exe -accepteula -a * -c -h -s -v -vt > autoruns.csv"
+          "id": "kape-ezparser",
+          "title": "Collect + Parse with EZTools",
+          "description": "Triage collection then run !EZParser modules on output.",
+          "command": "kape.exe --tsource C: --tdest C:\\kape_out --target !SANS_Triage --mdest C:\\kape_out --module !EZParser"
         },
         {
-          "id": "prefetch",
-          "title": "PECmd \u2014 Parse Prefetch",
-          "description": "Parse Windows Prefetch files for execution evidence.",
-          "command": "PECmd.exe -d C:\\Windows\\Prefetch --csv C:\\forensics\\prefetch\\"
-        },
-        {
-          "id": "mft-parse",
-          "title": "MFTECmd \u2014 Parse $MFT",
-          "description": "Parse the Master File Table for file system timeline.",
-          "command": "MFTECmd.exe -f C:\\$MFT --csv C:\\forensics\\mft\\"
+          "id": "kape-target-list",
+          "title": "List Available Targets",
+          "description": "Show installed KAPE targets before running a collection.",
+          "command": "kape.exe --tsource C: --tdest C:\\kape_out --target list"
         }
       ]
     },
     {
-      "id": "linuxir",
-      "title": "Linux IR",
-      "icon": "fa-linux",
+      "id": "velociraptor",
+      "title": "Velociraptor",
+      "order": 2,
+      "icon": "fa-feather",
       "commands": [
         {
-          "id": "linux-ps",
-          "title": "Process Enumeration",
-          "description": "List running processes with full command lines.",
-          "command": "ps auxww | grep -v '\\[' | sort"
+          "id": "velo-pslist",
+          "title": "Running Processes",
+          "description": "List processes on an endpoint via VQL.",
+          "command": "SELECT Pid, Name, CommandLine, Username, Exe FROM pslist()"
         },
         {
-          "id": "linux-netstat",
-          "title": "Active Connections",
-          "description": "Show listening ports and established connections.",
-          "command": "ss -tulpn && netstat -antp 2>/dev/null"
+          "id": "velo-netstat",
+          "title": "Network Connections",
+          "description": "Active connections and listening ports.",
+          "command": "SELECT Pid, Name, Laddr, Raddr, Status FROM netstat()"
         },
         {
-          "id": "linux-cron",
-          "title": "Cron Persistence Check",
-          "description": "Review cron jobs across users and system directories.",
-          "command": "for u in $(cut -f1 -d: /etc/passwd); do echo \"=== $u ===\"; crontab -l -u $u 2>/dev/null; done; ls -la /etc/cron.*"
+          "id": "velo-authenticode",
+          "title": "Unsigned Binary Check",
+          "description": "Find executables missing valid Authenticode signatures.",
+          "command": "SELECT FullPath, Authenticode FROM Authenticode().WHERE(Authenticode.Trusted != 'trusted')"
         },
         {
-          "id": "linux-auth",
-          "title": "Auth Log Review",
-          "description": "Hunt failed SSH logins and privilege escalation in auth logs.",
-          "command": "grep -E 'Failed password|Accepted password|sudo:' /var/log/auth.log | tail -100"
+          "id": "velo-collect",
+          "title": "Collect Forensic Artifacts",
+          "description": "Run a built-in artifact collection (adjust artifact name as needed).",
+          "command": "SELECT * FROM Artifact.Windows.KapeFiles.Targets()"
+        }
+      ]
+    },
+    {
+      "id": "winpmem",
+      "title": "WinPmem",
+      "order": 3,
+      "icon": "fa-memory",
+      "commands": [
+        {
+          "id": "winpmem-acquire",
+          "title": "Acquire Memory Dump",
+          "description": "Capture physical memory to a raw image file.",
+          "command": "winpmem.exe memory.raw"
         },
         {
-          "id": "linux-forensics",
-          "title": "UAC \u2014 Live Response Collection",
-          "description": "Collect Linux artifacts using UAC (Unix-like Artifact Collector).",
-          "command": "./uac -p full /path/to/evidence"
+          "id": "winpmem-write-protected",
+          "title": "Acquire (Write-Protected Driver)",
+          "description": "Memory capture using the recommended write-protected acquisition method.",
+          "command": "winpmem_mini_x64.exe memory.raw"
+        }
+      ]
+    },
+    {
+      "id": "volatility",
+      "title": "Volatility 3",
+      "order": 4,
+      "icon": "fa-microchip",
+      "defaultOpen": true,
+      "commands": [
+        {
+          "id": "vol3-info",
+          "title": "System Info",
+          "description": "Identify OS, kernel version, and architecture from the dump.",
+          "command": "vol -f memory.raw windows.info"
+        },
+        {
+          "id": "vol3-pslist",
+          "title": "Process List",
+          "description": "Enumerate running processes at time of capture.",
+          "command": "vol -f memory.raw windows.pslist"
+        },
+        {
+          "id": "vol3-pstree",
+          "title": "Process Tree",
+          "description": "Parent-child process relationships for spotting anomalies.",
+          "command": "vol -f memory.raw windows.pstree"
+        },
+        {
+          "id": "vol3-netscan",
+          "title": "Network Connections",
+          "description": "Active connections and listening ports from memory.",
+          "command": "vol -f memory.raw windows.netscan"
+        },
+        {
+          "id": "vol3-malfind",
+          "title": "Injected Code (malfind)",
+          "description": "Find suspicious memory regions and injected code.",
+          "command": "vol -f memory.raw windows.malfind"
+        },
+        {
+          "id": "vol3-cmdline",
+          "title": "Process Command Lines",
+          "description": "Recover command-line arguments for processes.",
+          "command": "vol -f memory.raw windows.cmdline"
+        }
+      ]
+    },
+    {
+      "id": "memprocfs",
+      "title": "MemProcFS",
+      "order": 5,
+      "icon": "fa-folder-tree",
+      "commands": [
+        {
+          "id": "memprocfs-mount",
+          "title": "Mount Memory Image",
+          "description": "Mount a memory dump as a virtual filesystem for browsing.",
+          "command": "memprocfs.exe -device memory.raw -forensic 1"
+        },
+        {
+          "id": "memprocfs-mount-m",
+          "title": "Mount to Drive Letter",
+          "description": "Mount memory image to M: for Explorer and tool access.",
+          "command": "memprocfs.exe -mount m -device memory.raw -forensic 1"
+        },
+        {
+          "id": "memprocfs-volatility",
+          "title": "Run Volatility Plugin via MemProcFS",
+          "description": "Execute a Volatility plugin through the MemProcFS API.",
+          "command": "memprocfs.exe -device memory.raw -forensic 1 -pythonexec \"vol windows.pslist\""
+        }
+      ]
+    },
+    {
+      "id": "eztools",
+      "title": "EZTools",
+      "order": 6,
+      "icon": "fa-wrench",
+      "commands": [
+        {
+          "id": "evtxecmd",
+          "title": "EvtxECmd \u2014 Parse EVTX",
+          "description": "Parse Windows event logs to CSV for timeline review.",
+          "command": "EvtxECmd.exe -d C:\\kape_out\\C\\Windows\\System32\\winevt\\Logs --csv C:\\parsed\\evtx\\"
+        },
+        {
+          "id": "pecmd",
+          "title": "PECmd \u2014 Parse Prefetch",
+          "description": "Parse Prefetch files for program execution evidence.",
+          "command": "PECmd.exe -d C:\\kape_out\\C\\Windows\\Prefetch --csv C:\\parsed\\prefetch\\"
+        },
+        {
+          "id": "mftecmd",
+          "title": "MFTECmd \u2014 Parse $MFT",
+          "description": "Parse the Master File Table for filesystem timeline.",
+          "command": "MFTECmd.exe -f C:\\kape_out\\C\\$MFT --csv C:\\parsed\\mft\\"
+        },
+        {
+          "id": "amcache",
+          "title": "AmcacheParser",
+          "description": "Parse Amcache for program execution artifacts.",
+          "command": "AmcacheParser.exe -f C:\\kape_out\\C\\Windows\\AppCompat\\Programs\\Amcache.hve --csv C:\\parsed\\amcache\\"
+        },
+        {
+          "id": "appcompatcache",
+          "title": "AppCompatCacheParser",
+          "description": "Parse ShimCache for execution history.",
+          "command": "AppCompatCacheParser.exe -f C:\\kape_out\\C\\Windows\\AppCompat\\Programs\\AppCompatCache --csv C:\\parsed\\shimcache\\"
+        }
+      ]
+    },
+    {
+      "id": "dd",
+      "title": "dd",
+      "order": 7,
+      "icon": "fa-hard-drive",
+      "commands": [
+        {
+          "id": "dd-acquire",
+          "title": "Create Disk Image",
+          "description": "Bit-for-bit copy of a source device to an image file.",
+          "command": "sudo dd if=/dev/sdb of=/cases/disk.img bs=64k conv=noerror,sync status=progress"
+        },
+        {
+          "id": "dd-hash",
+          "title": "Image + SHA256 Hash",
+          "description": "Create image and write SHA256 hash for chain of custody.",
+          "command": "sudo dd if=/dev/sdb bs=64k conv=noerror,sync status=progress | tee /cases/disk.img | sha256sum | tee /cases/disk.img.sha256"
+        },
+        {
+          "id": "dd-verify",
+          "title": "Verify Image Hash",
+          "description": "Confirm image integrity against a saved hash.",
+          "command": "sha256sum /cases/disk.img && cat /cases/disk.img.sha256"
         }
       ]
     }
