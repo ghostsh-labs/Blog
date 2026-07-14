@@ -11,19 +11,19 @@ tags: [clickfix, donut, process-injection, clr, rat, delivery-chain]
 
 ## Summary
 
-| Field | Value |
-|-------|-------|
-| Incident class | RAT delivery / process injection |
-| Initial vector | ClickFix social engineering (PowerShell paste) |
-| Stage 1 | PowerShell stager → in-memory Donut shellcode |
-| Stage 2 | `mod_s_enterprise` (native MinGW loader / injector) |
-| Stage 3 | `student_S.bin` (native PE; CLR host candidate) |
-| Execution host | `svchost.exe -k BthAppGroup -p -s BluetoothUserService` |
-| Managed implant | CLR assembly `sub00` (in-memory) |
-| Post-compromise | Screenshots, Edge DPAPI access, additional unbacked CLR loads |
-| Operational C2 | `91.92.243.161:3038` |
+```
+CLASS      : RAT delivery / process injection
+VECTOR     : ClickFix (PowerShell paste)
+STAGE 1    : PowerShell stager → in-memory Donut shellcode
+STAGE 2    : mod_s_enterprise (native MinGW loader / injector)
+STAGE 3    : student_S.bin (native PE; CLR host candidate)
+EXEC HOST  : svchost.exe -k BthAppGroup -p -s BluetoothUserService
+IMPLANT    : CLR assembly sub00 (in-memory)
+POST       : Screenshots, Edge DPAPI, additional unbacked CLR loads
+C2         : 91.92.243.161:3038
+```
 
-ClickFix lure instructed the user to run a PowerShell one-liner. The stager fetched Donut-packed shellcode, executed it in-memory, and injected into a Bluetooth-related `svchost` instance. Runtime telemetry then showed CLR assembly `sub00` loaded inside that process, followed by screenshot collection, browser credential access, and outbound C2.
+ClickFix lure instructed the user to run a PowerShell one-liner. Stager fetched Donut-packed shellcode, executed it in-memory, and injected into a Bluetooth-related `svchost` instance. Runtime telemetry showed CLR assembly `sub00` in that process, then screenshot collection, browser credential access, and outbound C2.
 
 ## Attack Chain
 

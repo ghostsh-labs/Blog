@@ -11,19 +11,19 @@ tags: [quick-assist, ditto, dll-sideload, domain-compromise, social-engineering]
 
 ## Summary
 
-| Field | Value |
-|-------|-------|
-| Incident class | KRBTGT compromise / domain intrusion |
-| Initial vector | Vishing + Microsoft Quick Assist |
-| Implant | DLL side-loaded RAT (Botan 3, AES-256-GCM, MinGW) |
-| C2 transport | Malformed DNS over UDP/53 |
-| Time to domain compromise | < 60 minutes |
-| Ransomware | Not observed |
-| Objective | Persistent privileged access |
+```
+CLASS      : KRBTGT compromise / domain intrusion
+VECTOR     : Vishing + Microsoft Quick Assist
+IMPLANT    : DLL side-loaded RAT (Botan 3, AES-256-GCM, MinGW)
+C2         : Malformed DNS over UDP/53 → 45.55.94.174
+TTX        : Domain compromise < 60 minutes
+RANSOMWARE : Not observed
+OBJECTIVE  : Persistent privileged access
+```
 
-A user at a client environment accepted an unsolicited Quick Assist session after a vishing call. The operator ran host reconnaissance, deployed two MSI packages (first blocked by Defender, second successful), and established persistence via a side-loaded DLL under a legitimate Ditto installation.
+Unsolicited Quick Assist session after a vishing call. Operator ran host recon, deployed two MSI packages (first blocked by Defender, second successful), and established persistence via a side-loaded DLL under a legitimate Ditto install.
 
-Within 30 minutes, the workstation was used for PetitPotam-style coercion, NTLM relay, and DCSync against the domain controller. A Domain Admin service account was used for RDP lateral movement. GetScreen and DWAgent were installed for additional persistence.
+Within 30 minutes: PetitPotam-style coercion, NTLM relay, and DCSync against the domain controller. A Domain Admin service account was used for RDP lateral movement. GetScreen and DWAgent were installed for additional persistence.
 
 ## Attack Chain
 
@@ -206,7 +206,7 @@ Eleven minutes after the first MSI:
 ```
 OPERATION : DRSGetNCChanges
 TARGET    : DC01
-SOURCE    : fld_a_<workstation>
+SOURCE    : <workstation>
 ```
 
 `DRSGetNCChanges` from a workstation indicates DCSync (Mimikatz, Impacket, or equivalent). This typically yields `krbtgt`, service account, and domain admin hashes. KRBTGT compromise enables Golden Ticket forgery until a double KRBTGT password reset is performed.

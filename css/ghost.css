@@ -1314,6 +1314,51 @@ footer {
     margin: 1rem 0;
 }
 
+.writeup-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.25rem;
+    font-size: 0.85rem;
+    background: var(--darker);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.writeup-body thead th {
+    text-align: left;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: rgba(0, 212, 255, 0.06);
+    border-bottom: 1px solid var(--card-border);
+    padding: 0.65rem 0.85rem;
+}
+
+.writeup-body tbody td {
+    padding: 0.55rem 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--light);
+    vertical-align: top;
+}
+
+.writeup-body tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.writeup-body tbody td:first-child {
+    color: var(--muted);
+    white-space: nowrap;
+    width: 1%;
+}
+
+.writeup-body tbody code {
+    white-space: normal;
+    word-break: break-all;
+}
+
 @media (max-width: 768px) {
     .hero-title {
         font-size: 2rem;

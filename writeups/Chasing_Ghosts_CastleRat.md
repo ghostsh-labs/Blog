@@ -9,11 +9,20 @@ tags: [clickfix, castle-rat, delivery-chain, windows, malware]
 
 # CastleRat Delivery Chain
 
-## Overview
+## Summary
 
-This writeup documents a ClickFix-style delivery chain that ends in CastleRat / NightShadeC2 deployment on a Windows endpoint. The initial access vector was social engineering: the user pasted an attacker-supplied command into the Run dialog (`Win+R`) while believing they were completing a CAPTCHA challenge.
+```
+CLASS      : RAT delivery / ClickFix chain
+VECTOR     : Social engineering (Win+R paste as fake CAPTCHA)
+STAGE 1    : cmdkey + remote schtasks XML over SMB
+STAGE 2    : PowerShell irm|iex stager (AMSI dilution)
+STAGE 3    : .NET loader → bundled Python runtime
+IMPLANT    : CastleRat / NightShadeC2
+C2 RESOLVE : Steam Community profile dead-drop
+C2         : 45.88.106.190:4545 (resolved)
+```
 
-The interesting part of this case is the delivery mechanism, not the payload. The final malware is noisy and detectable. The chain from user paste to remote task creation to in-memory PowerShell staging is where the operator tradecraft shows up.
+ClickFix-style delivery ending in CastleRat / NightShadeC2. User pasted an attacker-supplied command into Run (`Win+R`) believing it was CAPTCHA verification. The interesting part is the delivery path — remote task XML, junk-padded PowerShell, and Steam dead-drop C2 resolution — not the final implant.
 
 ## Initial Access — ClickFix
 
@@ -122,7 +131,7 @@ Sandbox analysis captured `csc.exe` invoked with `.cmdline` argument files, prod
 
 ```
 C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe
-    /noconfig /fullpaths @"C:\Users\admin\AppData\Local\Temp\is3na01s.cmdline"
+    /noconfig /fullpaths @"C:\Users\<user>\AppData\Local\Temp\is3na01s.cmdline"
 ```
 
 This indicates inline C# compilation from PowerShell (`Add-Type`). Source is generated at runtime, compiled, and loaded without a persistent malicious DLL on disk.
