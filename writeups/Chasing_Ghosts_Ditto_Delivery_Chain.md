@@ -66,7 +66,7 @@ These establish user context, network placement, reachable internal hosts, and d
 
 ## Payload Delivery
 
-### Stage 1 — Blocked
+### Stage 1 - Blocked
 
 ```
 URL    : http://<C2-DROP>/pd_53updates.msi
@@ -81,7 +81,7 @@ Potential Side-Loaded Behavior Was Blocked
 
 The associated `pdf24.exe` payload was quarantined and an alert was generated.
 
-### Stage 2 — Successful
+### Stage 2 - Successful
 
 Three minutes later, a second MSI was retrieved:
 
@@ -114,11 +114,11 @@ Persistence via Startup folder shortcut:
 
 ## DLL Side-Loading
 
-`Ditto.exe` is a legitimate clipboard manager. The malicious code resides in a supporting DLL loaded via standard DLL search order — the local copy in `%LOCALAPPDATA%\Ditto\` resolves before `C:\Windows\System32\`.
+`Ditto.exe` is a legitimate clipboard manager. The malicious code resides in a supporting DLL loaded via standard DLL search order - the local copy in `%LOCALAPPDATA%\Ditto\` resolves before `C:\Windows\System32\`.
 
 Ditto's legitimate behavior (clipboard hooks, window enumeration, process listing) provides cover for similar API usage by the implant.
 
-### Static Analysis — Implant Strings
+### Static Analysis - Implant Strings
 
 ```
 GCC: (GNU) 13-win32
@@ -167,7 +167,7 @@ NDUuNTUuOTQuMTc0  →  45.55.94.174
 
 Runtime fields: hostname, compile timestamp, architecture (`windows`), logged-on user, process ID. Payload is encrypted with AES-256-GCM before transmission.
 
-## C2 — Malformed DNS over UDP/53
+## C2 - Malformed DNS over UDP/53
 
 ```
 DESTINATION : 45.55.94.174
@@ -176,7 +176,7 @@ PROTOCOL    : UDP
 ORIGIN      : %LOCALAPPDATA%\Ditto\Ditto.exe
 ```
 
-Traffic was sent directly to the attacker IP, not to the corporate resolver. Packet inspection showed malformed DNS payloads — sufficient to blend into NetFlow as DNS traffic but not valid queries. Port 53 outbound is commonly unrestricted; payload encryption prevents content inspection without endpoint visibility.
+Traffic was sent directly to the attacker IP, not to the corporate resolver. Packet inspection showed malformed DNS payloads - sufficient to blend into NetFlow as DNS traffic but not valid queries. Port 53 outbound is commonly unrestricted; payload encryption prevents content inspection without endpoint visibility.
 
 ## Post-Exploitation
 
@@ -292,15 +292,15 @@ Three independent footholds resulted: the Ditto implant, GetScreen on the print 
 ### Network
 
 ```
-45.55.94.174       — C2 (DNS-tunneled, UDP/53)
-45.61.163.226      — MSI staging host
-167.172.212.171    — NTLM relay endpoint (DigitalOcean)
+45.55.94.174 - C2 (DNS-tunneled, UDP/53)
+45.61.163.226 - MSI staging host
+167.172.212.171 - NTLM relay endpoint (DigitalOcean)
 ```
 
 ### Encoded Strings
 
 ```
-NDUuNTUuOTQuMTc0   — Base64 for 45.55.94.174
+NDUuNTUuOTQuMTc0 - Base64 for 45.55.94.174
 ```
 
 ### Files

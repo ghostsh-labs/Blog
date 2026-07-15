@@ -9,7 +9,7 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "nmap-quick",
-          "title": "Quick Scan \u2014 Top Ports + Version",
+          "title": "Quick Scan - Top Ports + Version",
           "description": "Fast service detection on the most common ports.",
           "command": "nmap -sV -sC -T4 example.com -oA nmap-quick"
         },
@@ -45,7 +45,7 @@ window.GHOST_DATA = {
         },
         {
           "id": "masscan",
-          "title": "Masscan \u2014 Full Range",
+          "title": "Masscan - Full Range",
           "description": "High-speed full TCP range scan. Follow up open ports with Nmap.",
           "command": "masscan -p0-65535 example.com --rate 100000 -oG masscan-results.txt"
         }
@@ -60,7 +60,7 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "nuclei-single",
-          "title": "Single Target \u2014 All Templates",
+          "title": "Single Target - All Templates",
           "description": "Run the full Nuclei template set against one URL.",
           "command": "nuclei -u https://example.com -o nuclei-single.txt"
         },
@@ -105,37 +105,37 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "httpx-single",
-          "title": "Httpx \u2014 Single Target",
+          "title": "Httpx - Single Target",
           "description": "Probe a URL for status, title, tech stack, and IP.",
           "command": "httpx -u https://example.com -title -tech-detect -status-code -server -ip -follow-redirects -o httpx-out.txt"
         },
         {
           "id": "httpx-ip",
-          "title": "Httpx \u2014 Probe External IP",
+          "title": "Httpx - Probe External IP",
           "description": "Check an IP for live web services on common ports (C2/panel triage).",
           "command": "echo example.com | httpx -ip -title -tech-detect -status-code -server -ports 80,443,8080,8443,8000,8888 -o ip-probe.txt"
         },
         {
           "id": "curl-headers",
-          "title": "curl \u2014 Response Headers",
+          "title": "curl - Response Headers",
           "description": "Quick header grab for server, redirects, and security headers.",
           "command": "curl -sI https://example.com"
         },
         {
           "id": "curl-follow",
-          "title": "curl \u2014 Follow Redirect Chain",
+          "title": "curl - Follow Redirect Chain",
           "description": "Trace redirect chain and final response headers.",
           "command": "curl -sIL https://example.com"
         },
         {
           "id": "gobuster-dir",
-          "title": "Gobuster \u2014 Directory Brute Force",
+          "title": "Gobuster - Directory Brute Force",
           "description": "Discover hidden directories and files on a web server.",
           "command": "gobuster dir -u https://example.com -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-directories.txt -x php,html,js,txt,bak -t 50 -o gobuster-dirs.txt"
         },
         {
           "id": "gobuster-vhost",
-          "title": "Gobuster \u2014 Vhost Discovery",
+          "title": "Gobuster - Vhost Discovery",
           "description": "Brute force virtual hosts on the same IP.",
           "command": "gobuster vhost -u https://example.com -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt -t 50 -o gobuster-vhosts.txt"
         }
@@ -213,7 +213,7 @@ window.GHOST_DATA = {
         },
         {
           "id": "katana-passive",
-          "title": "Katana \u2014 Passive URL Collection",
+          "title": "Katana - Passive URL Collection",
           "description": "Collect URLs from passive sources via katana.",
           "command": "katana -u https://example.com -d 5 -ps -pss waybackarchive,commoncrawl,alienvault -kf -jc -fx -ef woff,css,png,svg,jpg,woff2,jpeg,gif,svg -o allurls.txt"
         },
@@ -233,25 +233,25 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "subfinder-basic",
-          "title": "Subfinder \u2014 Basic Discovery",
+          "title": "Subfinder - Basic Discovery",
           "description": "Recursive subdomain enumeration with subfinder.",
           "command": "subfinder -d example.com -all -recursive > subexample.com.txt"
         },
         {
           "id": "httpx-filter",
-          "title": "Httpx \u2014 Live Subdomain Filter",
+          "title": "Httpx - Live Subdomain Filter",
           "description": "Filter discovered subdomains to alive hosts on common web ports.",
           "command": "cat subexample.com.txt | httpx -ports 80,443,8080,8000,8888 -threads 200 -o subexample.coms_alive.txt"
         },
         {
           "id": "gobuster-dns",
-          "title": "Gobuster \u2014 DNS Subdomain Enum",
+          "title": "Gobuster - DNS Subdomain Enum",
           "description": "Enumerate subdomains via DNS brute force.",
           "command": "gobuster dns -d example.com -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -t 50 -o gobuster-dns.txt"
         },
         {
           "id": "subzy-check",
-          "title": "Subzy \u2014 Takeover Check",
+          "title": "Subzy - Takeover Check",
           "description": "Check for subdomain takeover vulnerabilities.",
           "command": "subzy run --targets subexample.coms.txt --concurrency 100 --hide_fails --verify_ssl"
         }
@@ -277,7 +277,7 @@ window.GHOST_DATA = {
         },
         {
           "id": "stored-xss",
-          "title": "Stored XSS \u2014 Form Endpoints",
+          "title": "Stored XSS - Form Endpoints",
           "description": "Nuclei XSS templates against auth-related endpoints.",
           "command": "cat urls.txt | grep -E \"(login|signup|register|forgot|password|reset)\" | httpx -silent | nuclei -t nuclei-templates/vulnerabilities/xss/ -severity critical,high"
         }
@@ -331,13 +331,13 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "ffuf-lfi",
-          "title": "LFI \u2014 Request File",
+          "title": "LFI - Request File",
           "description": "Bruteforce LFI using a saved HTTP request file.",
           "command": "ffuf -request lfi -request-proto https -w /usr/share/wordlists/offensive-payloads/LFI-payload.txt -c -mr \"root:\""
         },
         {
           "id": "ffuf-xss",
-          "title": "XSS \u2014 Request File",
+          "title": "XSS - Request File",
           "description": "Bruteforce XSS using a saved HTTP request file.",
           "command": "ffuf -request xss -request-proto https -w /usr/share/wordlists/xss-payloads.txt -c -mr \"<script>alert('XSS')</script>\""
         }
@@ -351,13 +351,13 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "arjun-passive",
-          "title": "Arjun \u2014 Passive",
+          "title": "Arjun - Passive",
           "description": "Passive parameter discovery with Arjun.",
           "command": "arjun -u https://example.com/endpoint.php -oT arjun_output.txt -t 10 --rate-limit 10 --passive -m GET,POST --headers \"User-Agent: Mozilla/5.0\""
         },
         {
           "id": "arjun-wordlist",
-          "title": "Arjun \u2014 Wordlist",
+          "title": "Arjun - Wordlist",
           "description": "Active parameter discovery with a custom wordlist.",
           "command": "arjun -u https://example.com/endpoint.php -oT arjun_output.txt -m GET,POST -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt -t 10 --rate-limit 10"
         }
@@ -391,7 +391,7 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "wpscan",
-          "title": "WPScan \u2014 Aggressive",
+          "title": "WPScan - Aggressive",
           "description": "Enumerate users, plugins, and themes with aggressive plugin detection.",
           "command": "wpscan --url https://example.com --disable-tls-checks --api-token YOUR_TOKEN -e at -e ap -e u --enumerate ap --plugins-detection aggressive --force"
         }
@@ -411,7 +411,7 @@ window.GHOST_DATA = {
         },
         {
           "id": "shodan-ip",
-          "title": "Shodan \u2014 IP Lookup",
+          "title": "Shodan - IP Lookup",
           "description": "Look up services and banners on a known external IP.",
           "command": "ip:example.com"
         }
@@ -583,19 +583,19 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "evtxecmd",
-          "title": "EvtxECmd \u2014 Parse EVTX",
+          "title": "EvtxECmd - Parse EVTX",
           "description": "Parse Windows event logs to CSV for timeline review.",
           "command": "EvtxECmd.exe -d C:\\kape_out\\C\\Windows\\System32\\winevt\\Logs --csv C:\\parsed\\evtx\\"
         },
         {
           "id": "pecmd",
-          "title": "PECmd \u2014 Parse Prefetch",
+          "title": "PECmd - Parse Prefetch",
           "description": "Parse Prefetch files for program execution evidence.",
           "command": "PECmd.exe -d C:\\kape_out\\C\\Windows\\Prefetch --csv C:\\parsed\\prefetch\\"
         },
         {
           "id": "mftecmd",
-          "title": "MFTECmd \u2014 Parse $MFT",
+          "title": "MFTECmd - Parse $MFT",
           "description": "Parse the Master File Table for filesystem timeline.",
           "command": "MFTECmd.exe -f C:\\kape_out\\C\\$MFT --csv C:\\parsed\\mft\\"
         },
@@ -649,13 +649,13 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "device-process-placeholder",
-          "title": "Process creation \u2014 template",
+          "title": "Process creation - template",
           "description": "Placeholder. Replace filters with your hunt criteria.",
           "command": "DeviceProcessEvents\n| where Timestamp > ago(7d)\n| where ActionType == \"ProcessCreated\"\n| project Timestamp, DeviceName, InitiatingProcessFileName, FileName, ProcessCommandLine\n| take 100"
         },
         {
           "id": "device-network-placeholder",
-          "title": "Outbound connection \u2014 template",
+          "title": "Outbound connection - template",
           "description": "Placeholder. Filter by remote IP, port, or process.",
           "command": "DeviceNetworkEvents\n| where Timestamp > ago(7d)\n| where RemotePort == 443\n| project Timestamp, DeviceName, InitiatingProcessFileName, RemoteIP, RemotePort\n| take 100"
         }
@@ -668,13 +668,13 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "signin-failures-placeholder",
-          "title": "Failed sign-ins \u2014 template",
+          "title": "Failed sign-ins - template",
           "description": "Placeholder. Add account, IP, or app filters as needed.",
           "command": "SigninLogs\n| where TimeGenerated > ago(24h)\n| where ResultType != 0\n| summarize FailedAttempts = count() by UserPrincipalName, IPAddress\n| order by FailedAttempts desc"
         },
         {
           "id": "risky-signin-placeholder",
-          "title": "Risky sign-ins \u2014 template",
+          "title": "Risky sign-ins - template",
           "description": "Placeholder. Requires Entra ID P2 / Identity Protection.",
           "command": "AADIdentityProtectionSignInLogs\n| where TimeGenerated > ago(7d)\n| where RiskLevelDuringSignIn in (\"medium\", \"high\")\n| project TimeGenerated, UserPrincipalName, IPAddress, RiskLevelDuringSignIn, RiskDetail"
         }
@@ -687,7 +687,7 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "email-threat-placeholder",
-          "title": "Malicious email \u2014 template",
+          "title": "Malicious email - template",
           "description": "Placeholder. Defender for Office 365 / MDO required.",
           "command": "EmailEvents\n| where Timestamp > ago(7d)\n| where ThreatTypes has \"Phish\"\n| project Timestamp, SenderFromAddress, RecipientEmailAddress, Subject, DeliveryAction"
         }
@@ -700,13 +700,13 @@ window.GHOST_DATA = {
       "commands": [
         {
           "id": "powershell-encoded-placeholder",
-          "title": "Encoded PowerShell \u2014 template",
+          "title": "Encoded PowerShell - template",
           "description": "Placeholder. Hunt for common LOLBin abuse patterns.",
           "command": "DeviceProcessEvents\n| where Timestamp > ago(7d)\n| where FileName =~ \"powershell.exe\"\n| where ProcessCommandLine has_any (\"-enc\", \"-EncodedCommand\", \"FromBase64String\")\n| project Timestamp, DeviceName, AccountName, ProcessCommandLine"
         },
         {
           "id": "lolbin-schtasks-placeholder",
-          "title": "Schtasks creation \u2014 template",
+          "title": "Schtasks creation - template",
           "description": "Placeholder. Scheduled task creation via command line.",
           "command": "DeviceProcessEvents\n| where Timestamp > ago(7d)\n| where FileName =~ \"schtasks.exe\"\n| where ProcessCommandLine has \"Create\"\n| project Timestamp, DeviceName, AccountName, ProcessCommandLine"
         }

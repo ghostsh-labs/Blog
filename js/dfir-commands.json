@@ -163,19 +163,19 @@
     "commands": [
       {
         "id": "evtxecmd",
-        "title": "EvtxECmd — Parse EVTX",
+        "title": "EvtxECmd - Parse EVTX",
         "description": "Parse Windows event logs to CSV for timeline review.",
         "command": "EvtxECmd.exe -d C:\\kape_out\\C\\Windows\\System32\\winevt\\Logs --csv C:\\parsed\\evtx\\"
       },
       {
         "id": "pecmd",
-        "title": "PECmd — Parse Prefetch",
+        "title": "PECmd - Parse Prefetch",
         "description": "Parse Prefetch files for program execution evidence.",
         "command": "PECmd.exe -d C:\\kape_out\\C\\Windows\\Prefetch --csv C:\\parsed\\prefetch\\"
       },
       {
         "id": "mftecmd",
-        "title": "MFTECmd — Parse $MFT",
+        "title": "MFTECmd - Parse $MFT",
         "description": "Parse the Master File Table for filesystem timeline.",
         "command": "MFTECmd.exe -f C:\\kape_out\\C\\$MFT --csv C:\\parsed\\mft\\"
       },

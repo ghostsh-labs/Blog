@@ -7,7 +7,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "mft",
         name: "$MFT",
-        description: "Master File Table — records every file/dir on NTFS volume including timestamps and metadata.",
+        description: "Master File Table - records every file/dir on NTFS volume including timestamps and metadata.",
         paths: ["C:\\$MFT", "%SystemDrive%\\$MFT"],
         registry: null,
         parser: "MFTECmd, Autopsy, FTK",
@@ -16,7 +16,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "usn-journal",
         name: "$UsnJrnl",
-        description: "NTFS change journal — file create, delete, rename events.",
+        description: "NTFS change journal - file create, delete, rename events.",
         paths: ["C:\\$Extend\\$UsnJrnl:$J", "%SystemDrive%\\$Extend\\$UsnJrnl:$J"],
         registry: null,
         parser: "MFTECmd (UsnJrnl), fsutil usn",
@@ -25,7 +25,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "prefetch",
         name: "Prefetch",
-        description: "Execution evidence — program run count, last run times, files loaded.",
+        description: "Execution evidence - program run count, last run times, files loaded.",
         paths: ["C:\\Windows\\Prefetch\\*.pf", "%SystemRoot%\\Prefetch\\"],
         registry: null,
         parser: "PECmd, PECmd (Eric Zimmerman)",
@@ -34,7 +34,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "lnk",
         name: "LNK Files (Shortcuts)",
-        description: "Shortcut metadata — target path, volume serial, MAC times, network paths.",
+        description: "Shortcut metadata - target path, volume serial, MAC times, network paths.",
         paths: [
           "%APPDATA%\\Microsoft\\Windows\\Recent\\*.lnk",
           "%APPDATA%\\Microsoft\\Office\\Recent\\*.lnk",
@@ -47,7 +47,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "jump-lists",
         name: "Jump Lists",
-        description: "Recent files/apps per application — automatic and custom destinations.",
+        description: "Recent files/apps per application - automatic and custom destinations.",
         paths: [
           "%APPDATA%\\Microsoft\\Windows\\Recent\\AutomaticDestinations-ms\\*.automaticDestinations-ms",
           "%APPDATA%\\Microsoft\\Windows\\Recent\\CustomDestinations-ms\\*.customDestinations-ms"
@@ -59,7 +59,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "thumbcache",
         name: "Thumbcache",
-        description: "Thumbnail database — proves folder/image was viewed in Explorer.",
+        description: "Thumbnail database - proves folder/image was viewed in Explorer.",
         paths: ["%LOCALAPPDATA%\\Microsoft\\Windows\\Explorer\\thumbcache_*.db"],
         registry: null,
         parser: "ThumbcacheViewer, ThumbcacheParser",
@@ -77,7 +77,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "pagefile",
         name: "Pagefile.sys",
-        description: "Virtual memory — may contain process memory fragments and strings.",
+        description: "Virtual memory - may contain process memory fragments and strings.",
         paths: ["C:\\pagefile.sys"],
         registry: null,
         parser: "Volatility, strings, bulk_extractor",
@@ -86,7 +86,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "hiberfil",
         name: "Hiberfil.sys",
-        description: "Hibernation file — compressed RAM snapshot of last hibernate.",
+        description: "Hibernation file - compressed RAM snapshot of last hibernate.",
         paths: ["C:\\hiberfil.sys"],
         registry: null,
         parser: "Volatility 2 (hiberfil), decompress tools",
@@ -147,7 +147,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "ntuser",
         name: "NTUSER.DAT",
-        description: "Per-user settings — UserAssist, RecentDocs, Run keys, typed paths.",
+        description: "Per-user settings - UserAssist, RecentDocs, Run keys, typed paths.",
         paths: ["C:\\Users\\<username>\\NTUSER.DAT"],
         registry: null,
         parser: "Registry Explorer, regripper",
@@ -156,7 +156,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "usrclass",
         name: "UsrClass.dat",
-        description: "Per-user COM/class registration — ShellBags, MUICache, BagMRU.",
+        description: "Per-user COM/class registration - ShellBags, MUICache, BagMRU.",
         paths: ["C:\\Users\\<username>\\AppData\\Local\\Microsoft\\Windows\\UsrClass.dat"],
         registry: null,
         parser: "ShellBags Explorer, SBECmd, Registry Explorer",
@@ -165,7 +165,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "amcache",
         name: "AmCache.hve",
-        description: "AmCache — program execution, file SHA1, compile times, install evidence.",
+        description: "AmCache - program execution, file SHA1, compile times, install evidence.",
         paths: ["C:\\Windows\\AppCompat\\Programs\\Amcache.hve"],
         registry: null,
         parser: "AmcacheParser, Amcache.py, Registry Explorer",
@@ -190,7 +190,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "shellbags",
         name: "ShellBags",
-        description: "Folder access history — window size, position, viewed folders (even deleted).",
+        description: "Folder access history - window size, position, viewed folders (even deleted).",
         paths: ["UsrClass.dat → HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU", "UsrClass.dat → ...\\Shell\\Bags"],
         registry: "HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU",
         parser: "SBECmd, ShellBags Explorer, shellbags.sh",
@@ -199,7 +199,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "shimcache",
         name: "ShimCache (AppCompatCache)",
-        description: "Application compatibility cache — evidence of file execution (no timestamp on older Win).",
+        description: "Application compatibility cache - evidence of file execution (no timestamp on older Win).",
         paths: ["SYSTEM hive → ControlSet00X\\Control\\Session Manager\\AppCompatCache"],
         registry: "SYSTEM\\ControlSet001\\Control\\Session Manager\\AppCompatCache",
         parser: "ShimCacheParser, AppCompatCacheParser, regripper",
@@ -208,7 +208,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "bam-dam",
         name: "BAM / DAM",
-        description: "Background/Desktop Activity Moderator — process execution with last run timestamp.",
+        description: "Background/Desktop Activity Moderator - process execution with last run timestamp.",
         paths: ["SYSTEM hive → Services\\bam\\State\\UserSettings\\<SID>", "SYSTEM hive → Services\\dam\\State\\UserSettings\\<SID>"],
         registry: "SYSTEM\\CurrentControlSet\\Services\\bam\\State\\UserSettings",
         parser: "bam-parser, Registry Explorer",
@@ -217,7 +217,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "userassist",
         name: "UserAssist",
-        description: "GUI program execution — run count, last executed (ROT13 encoded names).",
+        description: "GUI program execution - run count, last executed (ROT13 encoded names).",
         paths: ["NTUSER.DAT → Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist"],
         registry: "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{GUID}\\Count",
         parser: "UserAssistView, regripper, Registry Explorer",
@@ -235,7 +235,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "run-keys",
         name: "Run / RunOnce Keys",
-        description: "Persistence — programs set to run at logon.",
+        description: "Persistence - programs set to run at logon.",
         paths: ["NTUSER.DAT + SOFTWARE hive"],
         registry: "HKCU/HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run | RunOnce",
         parser: "regripper, Autoruns",
@@ -262,7 +262,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "mountpoints",
         name: "MountedDevices",
-        description: "USB/removable device connection history — volume GUID, serial hints.",
+        description: "USB/removable device connection history - volume GUID, serial hints.",
         paths: ["SYSTEM hive"],
         registry: "SYSTEM\\MountedDevices",
         parser: "USBDeview, regripper, Registry Explorer",
@@ -271,7 +271,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "usbstor",
         name: "USBSTOR",
-        description: "USB storage device enumeration — vendor, product, serial, install date.",
+        description: "USB storage device enumeration - vendor, product, serial, install date.",
         paths: ["SYSTEM hive"],
         registry: "SYSTEM\\CurrentControlSet\\Enum\\USBSTOR",
         parser: "USBDeview, regripper",
@@ -296,7 +296,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "tasks",
         name: "Scheduled Tasks",
-        description: "Scheduled job definitions — persistence and execution timing.",
+        description: "Scheduled job definitions - persistence and execution timing.",
         paths: ["C:\\Windows\\System32\\Tasks\\", "C:\\Windows\\Tasks\\"],
         registry: "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\TaskCache",
         parser: "autoruns, schtasks /query, TaskScheduler parser",
@@ -305,7 +305,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "services",
         name: "Windows Services",
-        description: "Service binaries and start type — persistence via service install.",
+        description: "Service binaries and start type - persistence via service install.",
         paths: ["C:\\Windows\\System32\\services.exe (live)", "SYSTEM hive → Services"],
         registry: "HKLM\\SYSTEM\\CurrentControlSet\\Services",
         parser: "autoruns, sc query, Registry Explorer",
@@ -314,7 +314,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "wmi",
         name: "WMI Repository",
-        description: "WMI permanent event subscriptions — fileless persistence.",
+        description: "WMI permanent event subscriptions - fileless persistence.",
         paths: ["C:\\Windows\\System32\\wbem\\Repository\\"],
         registry: "HKLM\\SOFTWARE\\Microsoft\\WBEM",
         parser: "Autoruns, wmiprvse analysis, PyWMIPersistence",
@@ -335,7 +335,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "powershell-history",
         name: "PowerShell Console History",
-        description: "PSReadLine command history — typed PowerShell commands.",
+        description: "PSReadLine command history - typed PowerShell commands.",
         paths: ["%APPDATA%\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt"],
         registry: null,
         parser: "Manual review, MFTECmd",
@@ -353,7 +353,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "sysmon",
         name: "Sysmon Event Log",
-        description: "Process create, network connect, file create — if Sysmon installed.",
+        description: "Process create, network connect, file create - if Sysmon installed.",
         paths: ["Microsoft-Windows-Sysmon/Operational.evtx"],
         registry: null,
         parser: "SysmonView, chainsaw, Event Log Explorer",
@@ -387,7 +387,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "application-evtx",
         name: "Application.evtx",
-        description: "Application errors and installs — MSI, app crashes.",
+        description: "Application errors and installs - MSI, app crashes.",
         paths: ["C:\\Windows\\System32\\winevt\\Logs\\Application.evtx"],
         registry: null,
         parser: "EvtxECmd",
@@ -400,7 +400,7 @@ window.GHOST_ARTIFACTS = [
         paths: ["C:\\Windows\\System32\\winevt\\Logs\\Microsoft-Windows-PowerShell%4Operational.evtx"],
         registry: null,
         parser: "EvtxECmd, chainsaw (Sigma)",
-        notes: "Enable via GPO for 4104 script blocks — critical for IR."
+        notes: "Enable via GPO for 4104 script blocks - critical for IR."
       },
       {
         id: "defender-evtx",
@@ -429,7 +429,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "taskscheduler-evtx",
         name: "Task Scheduler Operational",
-        description: "Task created, deleted, executed — ties to persistence.",
+        description: "Task created, deleted, executed - ties to persistence.",
         paths: ["Microsoft-Windows-TaskScheduler%4Operational.evtx"],
         registry: null,
         parser: "EvtxECmd",
@@ -438,7 +438,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "setupapi",
         name: "setupapi.dev.log",
-        description: "USB device install log — driver install timestamps per device.",
+        description: "USB device install log - driver install timestamps per device.",
         paths: ["C:\\Windows\\inf\\setupapi.dev.log", "C:\\Windows\\setupapi.dev.log"],
         registry: null,
         parser: "USB Device Viewer, manual parse",
@@ -485,7 +485,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "edge-chromium",
         name: "Microsoft Edge (Chromium)",
-        description: "Same structure as Chrome — history, cookies, extensions.",
+        description: "Same structure as Chrome - history, cookies, extensions.",
         paths: ["%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\History"],
         registry: null,
         parser: "Chrome-based forensic tools, Hindsight",
@@ -494,7 +494,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "outlook",
         name: "Outlook PST/OST",
-        description: "Email, attachments, calendar — local mail store.",
+        description: "Email, attachments, calendar - local mail store.",
         paths: ["%LOCALAPPDATA%\\Microsoft\\Outlook\\*.ost", "%USERPROFILE%\\Documents\\Outlook Files\\*.pst"],
         registry: null,
         parser: "PST Viewer, AXIOM, FTK",
@@ -503,7 +503,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "rdp-bitmap",
         name: "RDP Bitmap Cache",
-        description: "Cached screen regions from RDP sessions — can reconstruct partial screenshots.",
+        description: "Cached screen regions from RDP sessions - can reconstruct partial screenshots.",
         paths: ["%LOCALAPPDATA%\\Microsoft\\Terminal Server Client\\Cache\\bcache*.bmc"],
         registry: null,
         parser: "bmc-tools, RDP Bitmap Cache Parser",
@@ -512,7 +512,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "default-rdp",
         name: "Default.rdp / RDP Config",
-        description: "Saved RDP connection settings — hostnames, usernames.",
+        description: "Saved RDP connection settings - hostnames, usernames.",
         paths: ["%USERPROFILE%\\Documents\\Default.rdp", "%USERPROFILE%\\Documents\\*.rdp"],
         registry: "HKCU\\Software\\Microsoft\\Terminal Server Client\\Servers",
         parser: "Manual review, Registry Explorer",
@@ -521,7 +521,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "wer",
         name: "Windows Error Reporting (WER)",
-        description: "Crash reports — executable name, path, module, timestamp.",
+        description: "Crash reports - executable name, path, module, timestamp.",
         paths: [
           "C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\",
           "C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportQueue\\"
@@ -533,7 +533,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "timeline",
         name: "ActivitiesCache.db",
-        description: "Windows Timeline / Activity History — app usage across devices.",
+        description: "Windows Timeline / Activity History - app usage across devices.",
         paths: ["%LOCALAPPDATA%\\ConnectedDevicesPlatform\\<ID>\\ActivitiesCache.db"],
         registry: null,
         parser: "WxTCmd, SQLite browser",
@@ -553,12 +553,12 @@ window.GHOST_ARTIFACTS = [
         paths: ["%SystemRoot%\\System32\\LogFiles\\Firewall\\pfirewall.log"],
         registry: "HKLM\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\...\\Logging",
         parser: "Manual parse, LogParser",
-        notes: "Disabled by default — check if policy enabled it."
+        notes: "Disabled by default - check if policy enabled it."
       },
       {
         id: "hosts",
         name: "Hosts File",
-        description: "Static DNS overrides — used in malware redirection.",
+        description: "Static DNS overrides - used in malware redirection.",
         paths: ["C:\\Windows\\System32\\drivers\\etc\\hosts"],
         registry: null,
         parser: "Manual review",
@@ -567,7 +567,7 @@ window.GHOST_ARTIFACTS = [
       {
         id: "vpn-logs",
         name: "VPN Client Logs",
-        description: "VPN connection history — vendor-specific paths.",
+        description: "VPN connection history - vendor-specific paths.",
         paths: ["C:\\ProgramData\\<VPN Vendor>\\Logs\\", "%APPDATA%\\<VPN Vendor>\\"],
         registry: null,
         parser: "Vendor-specific",
@@ -576,11 +576,11 @@ window.GHOST_ARTIFACTS = [
       {
         id: "zone-identifier",
         name: "Zone.Identifier (ADS)",
-        description: "Mark-of-the-Web — proves file downloaded from internet.",
+        description: "Mark-of-the-Web - proves file downloaded from internet.",
         paths: ["<file>:Zone.Identifier (NTFS Alternate Data Stream)"],
         registry: null,
         parser: "streams.exe, LECmd, PowerShell Get-Content -Stream Zone.Identifier",
-        notes: "Not a single path — ADS attached to downloaded files."
+        notes: "Not a single path - ADS attached to downloaded files."
       }
     ]
   },
@@ -641,7 +641,7 @@ window.GHOST_ARTIFACTS = [
         paths: ["/var/log/wtmp", "/var/log/btmp", "/var/run/utmp"],
         registry: null,
         parser: "last, lastb, utmpdump",
-        notes: "Binary format — use last/lastb commands."
+        notes: "Binary format - use last/lastb commands."
       }
     ]
   }

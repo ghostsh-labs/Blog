@@ -1,8 +1,8 @@
-# GHOST — DFIR & OffSec Field Notes
+# GHOST - DFIR & OffSec Field Notes
 
 Live site: **https://ghostsh-labs.github.io/Blog/**
 
-> Use the `/Blog/` URL — `https://ghostsh-labs.github.io/` alone will 404.
+> Use the `/Blog/` URL - `https://ghostsh-labs.github.io/` alone will 404.
 
 Writeups page: **https://ghostsh-labs.github.io/Blog/writeups.html**
 

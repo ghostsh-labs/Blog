@@ -41,7 +41,7 @@
 
         if (!data.length) {
             grid.innerHTML =
-                '<div class="no-results"><i class="fas fa-pen-nib"></i> No writeups yet — check back soon.</div>';
+                '<div class="no-results"><i class="fas fa-pen-nib"></i> No writeups yet - check back soon.</div>';
             return;
         }
 

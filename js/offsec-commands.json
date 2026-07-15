@@ -8,7 +8,7 @@
     "commands": [
       {
         "id": "nmap-quick",
-        "title": "Quick Scan — Top Ports + Version",
+        "title": "Quick Scan - Top Ports + Version",
         "description": "Fast service detection on the most common ports.",
         "command": "nmap -sV -sC -T4 example.com -oA nmap-quick"
       },
@@ -44,7 +44,7 @@
       },
       {
         "id": "masscan",
-        "title": "Masscan — Full Range",
+        "title": "Masscan - Full Range",
         "description": "High-speed full TCP range scan. Follow up open ports with Nmap.",
         "command": "masscan -p0-65535 example.com --rate 100000 -oG masscan-results.txt"
       }
@@ -59,7 +59,7 @@
     "commands": [
       {
         "id": "nuclei-single",
-        "title": "Single Target — All Templates",
+        "title": "Single Target - All Templates",
         "description": "Run the full Nuclei template set against one URL.",
         "command": "nuclei -u https://example.com -o nuclei-single.txt"
       },
@@ -104,37 +104,37 @@
     "commands": [
       {
         "id": "httpx-single",
-        "title": "Httpx — Single Target",
+        "title": "Httpx - Single Target",
         "description": "Probe a URL for status, title, tech stack, and IP.",
         "command": "httpx -u https://example.com -title -tech-detect -status-code -server -ip -follow-redirects -o httpx-out.txt"
       },
       {
         "id": "httpx-ip",
-        "title": "Httpx — Probe External IP",
+        "title": "Httpx - Probe External IP",
         "description": "Check an IP for live web services on common ports (C2/panel triage).",
         "command": "echo example.com | httpx -ip -title -tech-detect -status-code -server -ports 80,443,8080,8443,8000,8888 -o ip-probe.txt"
       },
       {
         "id": "curl-headers",
-        "title": "curl — Response Headers",
+        "title": "curl - Response Headers",
         "description": "Quick header grab for server, redirects, and security headers.",
         "command": "curl -sI https://example.com"
       },
       {
         "id": "curl-follow",
-        "title": "curl — Follow Redirect Chain",
+        "title": "curl - Follow Redirect Chain",
         "description": "Trace redirect chain and final response headers.",
         "command": "curl -sIL https://example.com"
       },
       {
         "id": "gobuster-dir",
-        "title": "Gobuster — Directory Brute Force",
+        "title": "Gobuster - Directory Brute Force",
         "description": "Discover hidden directories and files on a web server.",
         "command": "gobuster dir -u https://example.com -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-directories.txt -x php,html,js,txt,bak -t 50 -o gobuster-dirs.txt"
       },
       {
         "id": "gobuster-vhost",
-        "title": "Gobuster — Vhost Discovery",
+        "title": "Gobuster - Vhost Discovery",
         "description": "Brute force virtual hosts on the same IP.",
         "command": "gobuster vhost -u https://example.com -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt -t 50 -o gobuster-vhosts.txt"
       }
@@ -212,7 +212,7 @@
       },
       {
         "id": "katana-passive",
-        "title": "Katana — Passive URL Collection",
+        "title": "Katana - Passive URL Collection",
         "description": "Collect URLs from passive sources via katana.",
         "command": "katana -u https://example.com -d 5 -ps -pss waybackarchive,commoncrawl,alienvault -kf -jc -fx -ef woff,css,png,svg,jpg,woff2,jpeg,gif,svg -o allurls.txt"
       },
@@ -232,25 +232,25 @@
     "commands": [
       {
         "id": "subfinder-basic",
-        "title": "Subfinder — Basic Discovery",
+        "title": "Subfinder - Basic Discovery",
         "description": "Recursive subdomain enumeration with subfinder.",
         "command": "subfinder -d example.com -all -recursive > subexample.com.txt"
       },
       {
         "id": "httpx-filter",
-        "title": "Httpx — Live Subdomain Filter",
+        "title": "Httpx - Live Subdomain Filter",
         "description": "Filter discovered subdomains to alive hosts on common web ports.",
         "command": "cat subexample.com.txt | httpx -ports 80,443,8080,8000,8888 -threads 200 -o subexample.coms_alive.txt"
       },
       {
         "id": "gobuster-dns",
-        "title": "Gobuster — DNS Subdomain Enum",
+        "title": "Gobuster - DNS Subdomain Enum",
         "description": "Enumerate subdomains via DNS brute force.",
         "command": "gobuster dns -d example.com -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -t 50 -o gobuster-dns.txt"
       },
       {
         "id": "subzy-check",
-        "title": "Subzy — Takeover Check",
+        "title": "Subzy - Takeover Check",
         "description": "Check for subdomain takeover vulnerabilities.",
         "command": "subzy run --targets subexample.coms.txt --concurrency 100 --hide_fails --verify_ssl"
       }
@@ -276,7 +276,7 @@
       },
       {
         "id": "stored-xss",
-        "title": "Stored XSS — Form Endpoints",
+        "title": "Stored XSS - Form Endpoints",
         "description": "Nuclei XSS templates against auth-related endpoints.",
         "command": "cat urls.txt | grep -E \"(login|signup|register|forgot|password|reset)\" | httpx -silent | nuclei -t nuclei-templates/vulnerabilities/xss/ -severity critical,high"
       }
@@ -330,13 +330,13 @@
     "commands": [
       {
         "id": "ffuf-lfi",
-        "title": "LFI — Request File",
+        "title": "LFI - Request File",
         "description": "Bruteforce LFI using a saved HTTP request file.",
         "command": "ffuf -request lfi -request-proto https -w /usr/share/wordlists/offensive-payloads/LFI-payload.txt -c -mr \"root:\""
       },
       {
         "id": "ffuf-xss",
-        "title": "XSS — Request File",
+        "title": "XSS - Request File",
         "description": "Bruteforce XSS using a saved HTTP request file.",
         "command": "ffuf -request xss -request-proto https -w /usr/share/wordlists/xss-payloads.txt -c -mr \"<script>alert('XSS')</script>\""
       }
@@ -350,13 +350,13 @@
     "commands": [
       {
         "id": "arjun-passive",
-        "title": "Arjun — Passive",
+        "title": "Arjun - Passive",
         "description": "Passive parameter discovery with Arjun.",
         "command": "arjun -u https://example.com/endpoint.php -oT arjun_output.txt -t 10 --rate-limit 10 --passive -m GET,POST --headers \"User-Agent: Mozilla/5.0\""
       },
       {
         "id": "arjun-wordlist",
-        "title": "Arjun — Wordlist",
+        "title": "Arjun - Wordlist",
         "description": "Active parameter discovery with a custom wordlist.",
         "command": "arjun -u https://example.com/endpoint.php -oT arjun_output.txt -m GET,POST -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt -t 10 --rate-limit 10"
       }
@@ -390,7 +390,7 @@
     "commands": [
       {
         "id": "wpscan",
-        "title": "WPScan — Aggressive",
+        "title": "WPScan - Aggressive",
         "description": "Enumerate users, plugins, and themes with aggressive plugin detection.",
         "command": "wpscan --url https://example.com --disable-tls-checks --api-token YOUR_TOKEN -e at -e ap -e u --enumerate ap --plugins-detection aggressive --force"
       }
@@ -410,7 +410,7 @@
       },
       {
         "id": "shodan-ip",
-        "title": "Shodan — IP Lookup",
+        "title": "Shodan - IP Lookup",
         "description": "Look up services and banners on a known external IP.",
         "command": "ip:example.com"
       }

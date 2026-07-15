@@ -11,7 +11,7 @@
     }
 
     function renderPaths(paths) {
-        if (!paths || !paths.length) return '<span class="artifact-muted">—</span>';
+        if (!paths || !paths.length) return '<span class="artifact-muted">-</span>';
         return paths
             .map(
                 (p) => `

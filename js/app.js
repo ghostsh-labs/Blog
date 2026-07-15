@@ -51,7 +51,7 @@
         { name: 'KAPE', desc: 'Targeted artifact collection and parsing', url: 'https://www.kroll.com/en/services/cyber-risk/incident-response-litigation-support/kroll-artifact-parser-extractor-kape' },
         { name: 'Velociraptor', desc: 'Endpoint visibility, VQL hunting, and collection', url: 'https://github.com/Velocidex/velociraptor' },
         { name: 'WinPmem', desc: 'Windows physical memory acquisition', url: 'https://github.com/Velocidex/WinPmem' },
-        { name: 'EZTools', desc: 'Eric Zimmerman parsers — EvtxECmd, PECmd, MFTECmd', url: 'https://ericzimmerman.github.io/' },
+        { name: 'EZTools', desc: 'Eric Zimmerman parsers - EvtxECmd, PECmd, MFTECmd', url: 'https://ericzimmerman.github.io/' },
         { name: 'Volatility 3', desc: 'Memory forensics framework', url: 'https://github.com/volatilityfoundation/volatility3' },
         { name: 'MemProcFS', desc: 'Memory dump filesystem and forensic analysis', url: 'https://github.com/ufrisk/MemProcFS' },
         { name: 'Nuclei', desc: 'Template-based vulnerability scanner', url: 'https://github.com/projectdiscovery/nuclei' },
