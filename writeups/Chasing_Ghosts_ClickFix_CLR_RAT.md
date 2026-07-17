@@ -128,13 +128,29 @@ Thread entry is the `/s_enterprise` download. That blob is Donut-class packing t
 
 ### `s_enterprise` (next stage)
 
+Surface indicators:
+
 - No PE headers; elevated entropy
 - High-entropy noise and packing prologue fragments (`WAVAWH`, `A_A^A]A\_^]`)
-- Consistent with packed/encoded shellcode (Donut-class wrapper)
+- Executed as raw shellcode via RWX + `CreateThread`
+
+Manual reversing of the blob (raw x64 in Ghidra) went further than tooling alone. `file` / FLOSS treated it as opaque data (essentially no decoded strings), but disassembly showed a full shellcode loader:
+
+| Behavior | Observation |
+|---|---|
+| Module walk | PEB access via `GS:[0x30]`, enumerate loaded modules |
+| API resolve | PE export table parse + name hashing (incl. forwarders) |
+| Runtime context | Large structure copied into allocated context for later use |
+| Payload transfer | Size / data fields in that context; byte-copy into destination buffer |
+| Hygiene | Source and destination buffers wiped after transfer |
+
+Static carving from fixed file offsets failed: size/data fields are runtime-structure-relative, not simple on-disk blob offsets. That matches empty FLOSS output — the stage is a loader framework, not a string-rich implant.
+
+This does **not** recover a Donut config or prove a specific Donut build. It does support classifying `/s_enterprise` as Donut-class shellcode that unpacks/maps a native payload rather than as random packed noise. Clean next stage remains `mod_s_enterprise` via unwrap / memory extraction.
 
 ## Stage 2 - Donut → mod_s_enterprise
 
-Donut decryption of `s_enterprise` yields native PE `mod_s_enterprise`. This binary is the loader/injector that fetches and injects the next stage.
+Donut-class unpack of `s_enterprise` yields native PE `mod_s_enterprise`. This binary is the loader/injector that fetches and injects the next stage.
 
 ### capa / ATT&CK
 
