@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOST - DFIR &amp; OffSec</title>
-    <meta name="description" content="GHOST - personal DFIR and offensive security blog, toolkit, and reference">
+    <title>GHOST - DFIR &amp; Threat Research</title>
+    <meta name="description" content="DFIR &amp; threat research: incident writeups, IOCs, and detections.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/ghost.css">
 </head>
@@ -17,9 +17,19 @@
         <div class="intro-content">
             <div class="intro-ghost">GHOST</div>
             <div class="intro-line"></div>
-            <div class="intro-sub">Personal blog &amp; reference</div>
+            <div class="intro-sub">DFIR &amp; threat research</div>
         </div>
     </div>
+    <script>
+        // Splash plays once per session; skip it on later page loads.
+        try {
+            if (sessionStorage.getItem('ghostIntroSeen')) {
+                document.querySelector('.intro-container').remove();
+            } else {
+                sessionStorage.setItem('ghostIntroSeen', '1');
+            }
+        } catch (e) {}
+    </script>
 
     <nav class="navbar" role="navigation">
         <a href="index.html" class="logo" aria-label="GHOST">
@@ -32,17 +42,25 @@
         <div class="mobile-overlay"></div>
         <div class="nav-links">
             <a href="index.html" class="active">Home</a>
+            <a href="writeups.html">Writeups</a>
             <a href="toolkit.html">Toolkit</a>
             <a href="artifacts.html">Artifacts</a>
-            <a href="writeups.html">Writeups</a>
-            <a href="knowledge.html">Knowledge</a>
+            <a href="about.html">About</a>
         </div>
     </nav>
 
     <main class="container">
-        <section class="hero-section">
+        <section class="hero-section hero-compact">
             <h1 class="hero-title">GHOST</h1>
-            <p class="hero-subtitle">personal blog &amp; command cheatsheets</p>
+            <p class="hero-subtitle">DFIR &amp; threat research: incident writeups, IOCs, detections</p>
+        </section>
+
+        <section class="blog-section">
+            <div class="section-header">
+                <h2><i class="fas fa-rss"></i> Latest Writeups</h2>
+                <a href="writeups.html" class="view-all">View all <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="writeups-grid" id="blog-summaries"></div>
         </section>
 
         <section class="quick-links">
@@ -56,30 +74,17 @@
                 <h3>Artifacts</h3>
                 <p>DFIR cheat sheet - Prefetch, ShellBags, AmCache, EVTX locations</p>
             </a>
-            <a href="writeups.html" class="quick-link-card">
-                <i class="fas fa-pen-nib"></i>
-                <h3>Writeups</h3>
-                <p>Full blog posts - methodologies, walkthroughs, and lessons learned</p>
+            <a href="about.html" class="quick-link-card">
+                <i class="fas fa-user-secret"></i>
+                <h3>About</h3>
+                <p>Who writes this, what I work on, and how to reach me</p>
             </a>
-            <a href="knowledge.html" class="quick-link-card">
-                <i class="fas fa-brain"></i>
-                <h3>Knowledge</h3>
-                <p>How I do things - methodology, workflow &amp; tooling notes</p>
-            </a>
-        </section>
-
-        <section class="blog-section">
-            <div class="section-header">
-                <h2><i class="fas fa-rss"></i> Latest Writeups</h2>
-                <a href="writeups.html" class="view-all">View all <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="writeups-grid" id="blog-summaries"></div>
         </section>
     </main>
 
     <footer>
         <p class="footer-text">
-            <span>GHOST</span> - personal blog &amp; cheatsheets
+            <span>GHOST</span> - DFIR &amp; threat research
         </p>
     </footer>
 
@@ -87,7 +92,7 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <script src="js/writeups-data.js?v=7"></script>
+    <script src="js/writeups-data.js?v=8"></script>
     <script src="js/ghost-common.js"></script>
     <script src="js/home.js"></script>
 </body>

@@ -1,4 +1,4 @@
-# GHOST - DFIR & OffSec Field Notes
+# GHOST - DFIR & Threat Research
 
 Live site: **https://ghostsh-labs.github.io/Blog/**
 
@@ -10,9 +10,7 @@ Writeups page: **https://ghostsh-labs.github.io/Blog/writeups.html**
 - [Ditto DLL Side-Loading and Domain Compromise](https://ghostsh-labs.github.io/Blog/writeups.html#ditto-delivery-chain)
 - [ClickFix to CLR RAT Delivery Chain](https://ghostsh-labs.github.io/Blog/writeups.html#clickfix-clr-rat)
 
-Knowledge page: **https://ghostsh-labs.github.io/Blog/knowledge.html**
-
-Toolkit, artifact references, investigation writeups, and knowledge notes.
+Incident writeups, IOCs and detections, plus a command toolkit and a DFIR artifact reference.
 
 ## Writeups
 
@@ -25,8 +23,10 @@ git commit -m "Add writeup"
 git push
 ```
 
-## Knowledge
+## Knowledge (hidden)
 
+The Knowledge page exists but isn't linked from the nav or home page until it has a note.
+To show it again, re-add the link to the `nav-links` block on each page and a card on `index.html`.
 Source files live in [`knowledge/`](knowledge/). After adding or editing a note:
 
 ```bash

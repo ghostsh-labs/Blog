@@ -47,6 +47,8 @@ def preprocess_obsidian(text: str) -> str:
 
 
 def estimate_read_time(text: str) -> str:
+    # IOC tables are reference material, not read linearly.
+    text = re.split(r"\n## (?:IOCs|Indicators of Compromise)\b", text)[0]
     words = len(re.findall(r"\b\w+\b", text))
     minutes = max(1, round(words / WORDS_PER_MINUTE))
     return f"{minutes} min"
