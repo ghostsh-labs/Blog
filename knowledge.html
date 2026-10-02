@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOST - Knowledge</title>
+    <meta name="description" content="How I do things - methodology, workflow, and tooling notes">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/ghost.css">
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="scanlines"></div>
+    <div class="particles-container"></div>
+
+    <nav class="navbar" role="navigation">
+        <a href="index.html" class="logo" aria-label="GHOST">
+            <i class="fas fa-ghost"></i>
+            <span>GHOST</span>
+        </a>
+        <button class="menu-toggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-overlay"></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="toolkit.html">Toolkit</a>
+            <a href="artifacts.html">Artifacts</a>
+            <a href="writeups.html">Writeups</a>
+            <a href="knowledge.html" class="active">Knowledge</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="search-container">
+            <h1>KNOWLEDGE</h1>
+            <p class="subtitle">how I do things - methodology, workflow &amp; tooling notes</p>
+
+            <input
+                type="text"
+                id="search-input"
+                class="search-input"
+                placeholder="Search notes..."
+                aria-label="Search knowledge notes"
+                style="max-width: 700px; width: 100%;"
+            >
+        </section>
+
+        <div id="knowledge-list-view">
+            <div class="tag-filters" id="tag-filters"></div>
+            <div class="writeups-grid" id="knowledge-grid"></div>
+        </div>
+
+        <div id="knowledge-detail-view" style="display: none;"></div>
+    </main>
+
+    <footer>
+        <p class="footer-text">
+            <span>GHOST</span> - knowledge &amp; field notes
+        </p>
+    </footer>
+
+    <button id="scroll-to-top" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="js/knowledge-data.js?v=1"></script>
+    <script src="js/ghost-common.js"></script>
+    <script src="js/knowledge.js"></script>
+</body>
+</html>

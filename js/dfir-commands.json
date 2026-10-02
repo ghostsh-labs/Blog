@@ -1,0 +1,222 @@
+[
+  {
+    "id": "kape",
+    "title": "KAPE",
+    "order": 1,
+    "icon": "fa-box-archive",
+    "defaultOpen": true,
+    "commands": [
+      {
+        "id": "kape-triage",
+        "title": "SANS Triage Collection",
+        "description": "Rapid artifact collection using the !SANS_Triage target.",
+        "command": "kape.exe --tsource C: --tdest C:\\kape_out --target !SANS_Triage"
+      },
+      {
+        "id": "kape-triage-remote",
+        "title": "SANS Triage → Network Share",
+        "description": "Collect triage artifacts to a UNC path or external drive.",
+        "command": "kape.exe --tsource C: --tdest \\\\share\\evidence\\HOSTNAME --target !SANS_Triage"
+      },
+      {
+        "id": "kape-ezparser",
+        "title": "Collect + Parse with EZTools",
+        "description": "Triage collection then run !EZParser modules on output.",
+        "command": "kape.exe --tsource C: --tdest C:\\kape_out --target !SANS_Triage --mdest C:\\kape_out --module !EZParser"
+      },
+      {
+        "id": "kape-target-list",
+        "title": "List Available Targets",
+        "description": "Show installed KAPE targets before running a collection.",
+        "command": "kape.exe --tsource C: --tdest C:\\kape_out --target list"
+      }
+    ]
+  },
+  {
+    "id": "velociraptor",
+    "title": "Velociraptor",
+    "order": 2,
+    "icon": "fa-feather",
+    "commands": [
+      {
+        "id": "velo-pslist",
+        "title": "Running Processes",
+        "description": "List processes on an endpoint via VQL.",
+        "command": "SELECT Pid, Name, CommandLine, Username, Exe FROM pslist()"
+      },
+      {
+        "id": "velo-netstat",
+        "title": "Network Connections",
+        "description": "Active connections and listening ports.",
+        "command": "SELECT Pid, Name, Laddr, Raddr, Status FROM netstat()"
+      },
+      {
+        "id": "velo-authenticode",
+        "title": "Unsigned Binary Check",
+        "description": "Find executables missing valid Authenticode signatures.",
+        "command": "SELECT FullPath, Authenticode FROM Authenticode().WHERE(Authenticode.Trusted != 'trusted')"
+      },
+      {
+        "id": "velo-collect",
+        "title": "Collect Forensic Artifacts",
+        "description": "Run a built-in artifact collection (adjust artifact name as needed).",
+        "command": "SELECT * FROM Artifact.Windows.KapeFiles.Targets()"
+      }
+    ]
+  },
+  {
+    "id": "winpmem",
+    "title": "WinPmem",
+    "order": 3,
+    "icon": "fa-memory",
+    "commands": [
+      {
+        "id": "winpmem-acquire",
+        "title": "Acquire Memory Dump",
+        "description": "Capture physical memory to a raw image file.",
+        "command": "winpmem.exe memory.raw"
+      },
+      {
+        "id": "winpmem-write-protected",
+        "title": "Acquire (Write-Protected Driver)",
+        "description": "Memory capture using the recommended write-protected acquisition method.",
+        "command": "winpmem_mini_x64.exe memory.raw"
+      }
+    ]
+  },
+  {
+    "id": "volatility",
+    "title": "Volatility 3",
+    "order": 4,
+    "icon": "fa-microchip",
+    "defaultOpen": true,
+    "commands": [
+      {
+        "id": "vol3-info",
+        "title": "System Info",
+        "description": "Identify OS, kernel version, and architecture from the dump.",
+        "command": "vol -f memory.raw windows.info"
+      },
+      {
+        "id": "vol3-pslist",
+        "title": "Process List",
+        "description": "Enumerate running processes at time of capture.",
+        "command": "vol -f memory.raw windows.pslist"
+      },
+      {
+        "id": "vol3-pstree",
+        "title": "Process Tree",
+        "description": "Parent-child process relationships for spotting anomalies.",
+        "command": "vol -f memory.raw windows.pstree"
+      },
+      {
+        "id": "vol3-netscan",
+        "title": "Network Connections",
+        "description": "Active connections and listening ports from memory.",
+        "command": "vol -f memory.raw windows.netscan"
+      },
+      {
+        "id": "vol3-malfind",
+        "title": "Injected Code (malfind)",
+        "description": "Find suspicious memory regions and injected code.",
+        "command": "vol -f memory.raw windows.malfind"
+      },
+      {
+        "id": "vol3-cmdline",
+        "title": "Process Command Lines",
+        "description": "Recover command-line arguments for processes.",
+        "command": "vol -f memory.raw windows.cmdline"
+      }
+    ]
+  },
+  {
+    "id": "memprocfs",
+    "title": "MemProcFS",
+    "order": 5,
+    "icon": "fa-folder-tree",
+    "commands": [
+      {
+        "id": "memprocfs-mount",
+        "title": "Mount Memory Image",
+        "description": "Mount a memory dump as a virtual filesystem for browsing.",
+        "command": "memprocfs.exe -device memory.raw -forensic 1"
+      },
+      {
+        "id": "memprocfs-mount-m",
+        "title": "Mount to Drive Letter",
+        "description": "Mount memory image to M: for Explorer and tool access.",
+        "command": "memprocfs.exe -mount m -device memory.raw -forensic 1"
+      },
+      {
+        "id": "memprocfs-volatility",
+        "title": "Run Volatility Plugin via MemProcFS",
+        "description": "Execute a Volatility plugin through the MemProcFS API.",
+        "command": "memprocfs.exe -device memory.raw -forensic 1 -pythonexec \"vol windows.pslist\""
+      }
+    ]
+  },
+  {
+    "id": "eztools",
+    "title": "EZTools",
+    "order": 6,
+    "icon": "fa-wrench",
+    "commands": [
+      {
+        "id": "evtxecmd",
+        "title": "EvtxECmd - Parse EVTX",
+        "description": "Parse Windows event logs to CSV for timeline review.",
+        "command": "EvtxECmd.exe -d C:\\kape_out\\C\\Windows\\System32\\winevt\\Logs --csv C:\\parsed\\evtx\\"
+      },
+      {
+        "id": "pecmd",
+        "title": "PECmd - Parse Prefetch",
+        "description": "Parse Prefetch files for program execution evidence.",
+        "command": "PECmd.exe -d C:\\kape_out\\C\\Windows\\Prefetch --csv C:\\parsed\\prefetch\\"
+      },
+      {
+        "id": "mftecmd",
+        "title": "MFTECmd - Parse $MFT",
+        "description": "Parse the Master File Table for filesystem timeline.",
+        "command": "MFTECmd.exe -f C:\\kape_out\\C\\$MFT --csv C:\\parsed\\mft\\"
+      },
+      {
+        "id": "amcache",
+        "title": "AmcacheParser",
+        "description": "Parse Amcache for program execution artifacts.",
+        "command": "AmcacheParser.exe -f C:\\kape_out\\C\\Windows\\AppCompat\\Programs\\Amcache.hve --csv C:\\parsed\\amcache\\"
+      },
+      {
+        "id": "appcompatcache",
+        "title": "AppCompatCacheParser",
+        "description": "Parse ShimCache for execution history.",
+        "command": "AppCompatCacheParser.exe -f C:\\kape_out\\C\\Windows\\AppCompat\\Programs\\AppCompatCache --csv C:\\parsed\\shimcache\\"
+      }
+    ]
+  },
+  {
+    "id": "dd",
+    "title": "dd",
+    "order": 7,
+    "icon": "fa-hard-drive",
+    "commands": [
+      {
+        "id": "dd-acquire",
+        "title": "Create Disk Image",
+        "description": "Bit-for-bit copy of a source device to an image file.",
+        "command": "sudo dd if=/dev/sdb of=/cases/disk.img bs=64k conv=noerror,sync status=progress"
+      },
+      {
+        "id": "dd-hash",
+        "title": "Image + SHA256 Hash",
+        "description": "Create image and write SHA256 hash for chain of custody.",
+        "command": "sudo dd if=/dev/sdb bs=64k conv=noerror,sync status=progress | tee /cases/disk.img | sha256sum | tee /cases/disk.img.sha256"
+      },
+      {
+        "id": "dd-verify",
+        "title": "Verify Image Hash",
+        "description": "Confirm image integrity against a saved hash.",
+        "command": "sha256sum /cases/disk.img && cat /cases/disk.img.sha256"
+      }
+    ]
+  }
+]

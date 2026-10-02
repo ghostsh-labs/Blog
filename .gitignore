@@ -1,0 +1,12 @@
+# IDE / editor harness (not part of the site)
+mcps/
+terminals/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
