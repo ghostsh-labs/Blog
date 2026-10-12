@@ -10,6 +10,7 @@ Writeups page: **https://ghostsh-labs.github.io/Blog/writeups.html**
 - [Ditto DLL Side-Loading and Domain Compromise](https://ghostsh-labs.github.io/Blog/writeups.html#ditto-delivery-chain)
 - [ClickFix to CLR RAT Delivery Chain](https://ghostsh-labs.github.io/Blog/writeups.html#clickfix-clr-rat)
 - [Teams ClickFix to a Sideloaded Backdoor and rclone Exfiltration](https://ghostsh-labs.github.io/Blog/writeups.html#teams-clickfix-sideload-rclone)
+- [ClickFix finger Lure to CastleLoader and a Hollowed node.exe Agent](https://ghostsh-labs.github.io/Blog/writeups.html#castleloader-finger-hollowed-agent)
 
 Incident writeups, IOCs and detections, plus a command toolkit and a DFIR artifact reference.
 
