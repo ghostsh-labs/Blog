@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHOST - Attack chain: ClickFix finger Lure to CastleLoader and a Hollowed node.exe Agent</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../css/ghost.css">
+<style>
+/* site overrides: keep evidence in its real case */
+.chain-hero .subtitle,.meta-chip,.node,.detail,.editor,.hint{text-transform:none}
+.meta-chip b{text-transform:uppercase}
+.detail .prompt::before{content:none}
+.container{max-width:1520px}
+
+/* ===================== ATTACK CHAIN ===================== */
+.chain-hero{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:1.75rem 2rem;margin-bottom:1.25rem;box-shadow:0 4px 30px rgba(0,0,0,.4)}
+.chain-hero .eyebrow{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--primary);background:rgba(0,102,255,.12);border:1px solid var(--card-border);padding:.2rem .5rem;border-radius:3px;display:inline-block;margin-bottom:.8rem}
+.chain-hero h1{font-family:var(--font-display);color:var(--primary);font-size:1.5rem;letter-spacing:3px;text-shadow:var(--glow);line-height:1.3}
+.chain-hero .subtitle{color:var(--muted);font-size:.85rem;margin-top:.5rem;max-width:80ch}
+.meta-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
+.meta-chip{font-size:.72rem;background:var(--darker);border:1px solid var(--card-border);border-radius:20px;padding:.3rem .8rem;color:var(--light)}
+.meta-chip b{color:var(--muted);font-weight:400;margin-right:.4rem;letter-spacing:1px;text-transform:uppercase;font-size:.65rem}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.legend,.actions{display:flex;flex-wrap:wrap;gap:.5rem}
+.pill{display:inline-flex;align-items:center;gap:.45rem;padding:.4rem .85rem;background:var(--card);border:1px solid var(--card-border);border-radius:20px;color:var(--muted);font-family:var(--font-mono);font-size:.72rem;cursor:pointer;transition:all var(--transition)}
+.pill:hover{color:var(--primary);border-color:var(--primary-dim);background:rgba(0,212,255,.08)}
+.pill .dot{width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.pill.off{opacity:.4}
+.pill.off .dot{box-shadow:none}
+
+.chain-wrap{position:relative;background:linear-gradient(180deg,rgba(13,17,23,.85),rgba(13,17,23,.55));border:1px solid var(--card-border);border-radius:8px;overflow-x:auto;overflow-y:hidden;padding:1.25rem 1.25rem 1.75rem}
+.chain{position:relative;display:flex;gap:4.25rem;min-width:max-content;align-items:stretch}
+.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:0}
+.edge{fill:none;stroke:var(--c);stroke-width:2;opacity:.85;transition:opacity var(--transition),stroke-width var(--transition);filter:drop-shadow(0 0 4px var(--c))}
+.edge.flow{stroke-dasharray:6 6;animation:flow 1s linear infinite}
+.edge.suspected{stroke-dasharray:3 6;animation:flow 1.6s linear infinite}
+.edge.dim{opacity:.1}
+.edge.hot{stroke-width:3;opacity:1}
+@keyframes flow{to{stroke-dashoffset:-12}}
+@media (prefers-reduced-motion:reduce){.edge.flow,.edge.suspected{animation:none}}
+
+.phase{position:relative;z-index:1;width:230px;display:flex;flex-direction:column;gap:1.5rem}
+.phase-head{font-family:var(--font-display);font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--primary);padding-bottom:.5rem;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+.phase-head small{font-family:var(--font-mono);font-size:.62rem;color:var(--muted);letter-spacing:1px}
+.phase-body{display:flex;flex-direction:column;gap:1.5rem;justify-content:center;flex:1}
+
+/* the blobs */
+.node{--c:var(--primary);position:relative;text-align:left;font-family:var(--font-mono);color:var(--light);cursor:pointer;
+  display:grid;grid-template-columns:auto 1fr;gap:.2rem .7rem;align-items:center;
+  padding:.85rem .95rem .8rem;background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--c) 16%,transparent),transparent 60%),var(--card);
+  border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:22px 22px 22px 8px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4),0 6px 22px rgba(0,0,0,.45),0 0 18px color-mix(in srgb,var(--c) 18%,transparent);
+  transition:transform var(--transition),box-shadow var(--transition),opacity var(--transition),border-color var(--transition)}
+.node:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 26px color-mix(in srgb,var(--c) 38%,transparent)}
+.node:focus-visible{outline:2px solid var(--c);outline-offset:3px}
+.node.active{border-color:var(--c);box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 40%,transparent),0 0 34px color-mix(in srgb,var(--c) 50%,transparent)}
+.node.dim{opacity:.3}
+.node.hidden{display:none}
+.node-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--c);font-size:.95rem;
+  background:color-mix(in srgb,var(--c) 12%,var(--darker));border:1px solid color-mix(in srgb,var(--c) 50%,transparent)}
+.node-title{font-size:.82rem;font-weight:600;color:var(--accent);line-height:1.3}
+.node-sub{grid-column:1/-1;font-size:.7rem;color:var(--muted);line-height:1.45;margin-top:.15rem}
+.node-foot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:.45rem}
+.node-tech{font-size:.62rem;letter-spacing:1px;color:var(--primary-dim);background:rgba(0,102,255,.12);border:1px solid var(--card-border);padding:.12rem .4rem;border-radius:3px}
+.node-step{font-family:var(--font-display);font-size:.62rem;letter-spacing:2px;color:var(--c);opacity:.9}
+/* node types */
+.t-confirmed{--c:#00d4ff}
+.t-suspected{--c:#ffaa00}
+.t-impact{--c:#ff3366}
+.t-detected{--c:#00ffaa}
+.legend .pill[data-type=confirmed]{--c:#00d4ff}.legend .pill[data-type=suspected]{--c:#ffaa00}
+.legend .pill[data-type=impact]{--c:#ff3366}.legend .pill[data-type=detected]{--c:#00ffaa}
+
+/* detail panel */
+.detail{position:fixed;top:0;right:0;height:100vh;width:min(440px,100vw);z-index:1100;background:rgba(10,14,20,.97);backdrop-filter:blur(12px);
+  border-left:1px solid var(--card-border);box-shadow:-10px 0 40px rgba(0,0,0,.6);transform:translateX(105%);transition:transform .3s ease;overflow-y:auto;padding:1.5rem 1.4rem 2rem}
+.detail.open{transform:none}
+.detail-close{position:absolute;top:.9rem;right:.9rem;background:none;border:1px solid var(--card-border);color:var(--primary);width:32px;height:32px;border-radius:4px;cursor:pointer}
+.detail-close:hover{background:rgba(0,212,255,.12)}
+.detail h2{font-family:var(--font-display);color:var(--primary);font-size:1.05rem;letter-spacing:2px;line-height:1.35;margin:.7rem 2rem .3rem 0}
+.badge{display:inline-block;font-size:.6rem;letter-spacing:1px;text-transform:uppercase;font-weight:600;padding:.2rem .45rem;border-radius:3px;color:var(--c);background:color-mix(in srgb,var(--c) 10%,transparent);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
+.detail .tech a{color:var(--primary);font-size:.78rem;text-decoration:none}.detail .tech a:hover{text-decoration:underline}
+.d-block{margin-top:1.1rem}
+.d-label{font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--primary-dim);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
+.d-text{font-size:.82rem;color:var(--light);line-height:1.6}
+.d-note{font-size:.78rem;color:var(--warning)}
+.ioc-row{display:flex;align-items:flex-start;gap:.5rem;background:var(--darker);border:1px solid rgba(0,212,255,.08);border-radius:4px;padding:.4rem .6rem;margin-bottom:.4rem}
+.ioc-row code{flex:1;font-size:.76rem;word-break:break-all;color:var(--light);font-family:var(--font-mono)}
+.ioc-row .copy-btn{padding:.15rem .3rem;font-size:.72rem}
+.flow-links{display:flex;flex-wrap:wrap;gap:.4rem}
+.flow-links button{font-family:var(--font-mono);font-size:.7rem;background:var(--card);color:var(--muted);border:1px solid var(--card-border);border-radius:20px;padding:.25rem .65rem;cursor:pointer}
+.flow-links button:hover{color:var(--primary);border-color:var(--primary-dim)}
+
+/* data editor */
+.editor{display:none;margin-bottom:1rem;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:1rem}
+.editor.open{display:block}
+.editor textarea{width:100%;height:260px;resize:vertical;background:var(--darker);color:var(--light);border:1px solid var(--primary-dim);border-radius:4px;padding:.8rem;font-family:var(--font-mono);font-size:.76rem;line-height:1.5}
+.editor textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,212,255,.15)}
+.editor .row{display:flex;gap:.5rem;margin-top:.6rem;align-items:center;flex-wrap:wrap}
+.btn{padding:.55rem 1.1rem;background:linear-gradient(135deg,var(--secondary),var(--primary-dim));border:none;border-radius:4px;color:var(--darker);font-family:var(--font-mono);font-weight:600;font-size:.78rem;cursor:pointer;transition:transform var(--transition),box-shadow var(--transition)}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+.err{color:var(--danger);font-size:.76rem}
+.hint{color:var(--muted);font-size:.72rem;margin-top:.8rem}
+@media (max-width:768px){.chain-hero{padding:1.25rem}.chain-hero h1{font-size:1.15rem}.detail{top:auto;bottom:0;height:70vh;width:100vw;border-left:none;border-top:1px solid var(--card-border);transform:translateY(105%)}}
+</style>
+</head>
+<body>
+<div class="cyber-grid"></div>
+<div class="scanlines"></div>
+
+<nav class="navbar" role="navigation">
+  <a href="../index.html" class="logo" aria-label="GHOST"><i class="fas fa-ghost"></i><span>GHOST</span></a>
+  <button class="menu-toggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+  <div class="mobile-overlay"></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="../writeups.html" class="active">Writeups</a>
+    <a href="../toolkit.html">Toolkit</a>
+    <a href="../artifacts.html">Artifacts</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<main class="container">
+  <section class="chain-hero">
+    <span class="eyebrow"><i class="fa-solid fa-diagram-project"></i> Attack Chain</span>
+    <h1 id="title"></h1>
+    <p class="subtitle" id="subtitle"></p>
+    <div class="meta-row" id="meta"></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="legend" id="legend"></div>
+    <div class="actions">
+      <button class="pill" id="btnEdit"><i class="fa-solid fa-code"></i> Edit data</button>
+      <button class="pill" id="btnClear"><i class="fa-solid fa-eraser"></i> Clear trace</button>
+    </div>
+  </div>
+
+  <section class="editor" id="editor">
+    <textarea id="json" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="btn" id="btnApply">Apply</button>
+      <button class="pill" id="btnCopyJson"><i class="fa-regular fa-copy"></i> Copy JSON</button>
+      <span class="err" id="err"></span>
+    </div>
+    <p class="hint">Edit the JSON and hit Apply to re-render. Paste the result into the <code>CHAIN</code> object in the file to make it permanent.</p>
+  </section>
+
+  <div class="chain-wrap" id="wrap">
+    <div class="chain" id="chain">
+      <svg class="edges" id="edges" aria-hidden="true">
+        <defs>
+          <marker id="ah-confirmed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#00d4ff"/></marker>
+          <marker id="ah-suspected" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ffaa00"/></marker>
+          <marker id="ah-impact" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff3366"/></marker>
+          <marker id="ah-detected" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#00ffaa"/></marker>
+        </defs>
+        <g id="edgeLayer"></g>
+      </svg>
+    </div>
+  </div>
+  <p class="hint">Click a blob to trace its full path and open details. Dashed amber = suspected / not confirmed.</p>
+</main>
+
+<aside class="detail" id="detail" aria-live="polite"></aside>
+
+<footer><p class="footer-text"><span>GHOST</span> // DFIR &amp; THREAT RESEARCH</p></footer>
+
+<script src="../js/ghost-common.js"></script>
+<script>
+/* =====================================================================
+   EDIT THIS. Everything on the page is generated from CHAIN.
+   node.type : confirmed | suspected | impact | detected
+   edge      : [from, to, kind?]   kind = confirmed | suspected | detected | impact (defaults to the target node's type)
+   icon      : any Font Awesome 6 free solid name (e.g. "skull", "key", "globe")
+   ===================================================================== */
+const CHAIN = {
+  title: "ClickFix finger Lure to CastleLoader and a Hollowed node.exe Agent",
+  subtitle: "A finger.exe paste runs a five-stage loader. The C2 picks which runs get tasks. The ones that do get NetSupport and a Rust agent running inside a second node.exe.",
+  meta: [
+    { k: "Source", v: "5 vendor sandbox runs" },
+    { k: "Family", v: "CastleLoader" },
+    { k: "Published", v: "2026-10-12" },
+    { k: "Tasked", v: "2 of 5 runs" },
+    { k: "Open", v: "How the agent learned its C2" }
+  ],
+  phases: [
+    { id: "ex",  name: "Execution",         ta: "TA0002" },
+    { id: "de",  name: "Defense Evasion",   ta: "TA0005" },
+    { id: "c2",  name: "Command & Control", ta: "TA0011" },
+    { id: "pe",  name: "Priv Escalation",   ta: "TA0004" },
+    { id: "col", name: "Collection",        ta: "TA0009" }
+  ],
+  nodes: [
+    { id: "paste", phase: "ex", type: "confirmed", icon: "paste",
+      label: "ClickFix finger paste", sub: "Win+R cmd /c one-liner runs finger.exe",
+      technique: "T1204.004",
+      desc: "The paste runs finger.exe against the lure server and executes the lines that come back as a batch script.",
+      iocs: ["searperfect[.]com"] },
+
+    { id: "ipy", phase: "ex", type: "confirmed", icon: "terminal",
+      label: "IronPython stager", sub: "Batch pulls IronPython, runs packed Python",
+      technique: "T1059.006",
+      desc: "The batch pulls IronPython 3.4.2 from GitHub, kills and restarts explorer.exe, and runs a zlib + base64 Python one-liner with ipyw32 -c. The Python downloads timer3 with certificate checks off and execs it." },
+
+    { id: "timer3", phase: "de", type: "confirmed", icon: "microchip",
+      label: "timer3 shellcode", sub: "XOR'd shellcode run from an executable heap",
+      technique: "T1620",
+      desc: "timer3 hides its Base64 behind sprinkled Cyrillic letters, XORs out a 6 KB shellcode with a 23-byte key and runs it from an executable heap. The shellcode finds its APIs by hash, fetches /v3 and RC4-decrypts it with the file's own first 64 bytes.",
+      iocs: ["hxxps://elrianda[.]com/<guid>/timer3", "hxxps://elrianda[.]com/<guid>/v3"] },
+
+    { id: "core", phase: "de", type: "confirmed", icon: "cubes",
+      label: "CastleLoader core", sub: "Embedded PE mapped into its own process",
+      technique: "T1620",
+      desc: "Stage 2 takes control through a ReplaceTextW dialog hook and maps an embedded PE in memory: the CastleLoader core. It crashes itself on a CIS-language system unless a marker file exists, and on VMware when the tasking turns that check on.",
+      iocs: ["d5878ead5480e30c6e5fca5071064c1d7b40b85cfbcc26f30a293c8bc3515b63"],
+      notes: "Family name is Moderate confidence: ANY.RUN, VirusTotal and Hybrid Analysis tag it CastleLoader and eleven details match published analysis." },
+
+    { id: "tasks", phase: "c2", type: "confirmed", icon: "tower-broadcast",
+      label: "Server-side tasking", sub: "ChaCha20 get_tasks. 2 of 5 runs got tasks",
+      technique: "T1573.001",
+      desc: "The core fetches settings with a 31-character token as the User-Agent, then talks ChaCha20 over base64. The key and nonce are constants in the code, so every captured check-in decodes. Two runs were handed three tasks. Three got nothing; the empty reply I decoded reads tasks: {}.",
+      iocs: ["elrianda[.]com", "185[.]168[.]208[.]41 (unverified)"],
+      notes: "High confidence the server decided. Why it picked those two runs is unknown." },
+
+    { id: "netsupport", phase: "c2", type: "impact", icon: "display",
+      label: "NetSupport Manager", sub: "Genuine client, silent, gateways on port 725",
+      technique: "T1219.002",
+      desc: "One task pulls an RC4-encrypted ZIP of genuine NetSupport Manager files, set up silent with two gateways. client32.exe started from a scheduled task at T+6 min.",
+      iocs: ["obalakino[.]com", "lepetitzincdetroit[.]com:725", "screening-consulting[.]com:725",
+             "0bec75c57ab96bfa53861dcc582bfb6b204d3a83964fbb581371f27dd3fb7ee6",
+             "C:\\ProgramData\\Prodclear\\Packages\\Network\\"] },
+
+    { id: "hollow", phase: "pe", type: "confirmed", icon: "ghost",
+      label: "Hollowed node.exe", sub: "index.js decrypts two blobs. Agent runs in a 2nd node.exe",
+      technique: "T1055.012",
+      desc: "The other task drops node.exe, an obfuscated index.js and two GUID-named .tmp files in C:\\ProgramData\\NodeView. index.js is only a launcher: it decrypts both files with AES-256-GCM and starts blob 1, which hollows a second node.exe with blob 2. Blob 2 is onedriveupdater.exe, a 19.5 MB Rust agent that talks WebSocket to its own C2.",
+      iocs: ["kiriosyka[.]com", "homelygrill[.]com/api/v1/agent/ws",
+             "abf4071fd91db063b5b0a168022f0e63c53e81d59b181c92207eb608e113f878",
+             "7ef943cb1e04e6356d8beb522f3ad38b1119746c59182cb870da76ac4d528c24",
+             "05cbcd7f44f9c2ddff261d12cd65b2c71b5eacadf27207647532b69683a28ce3"],
+      notes: "Open: how the agent learned homelygrill[.]com. The name is not in the file in any encoding I tried, and the Steam dead-drop resolver in the code never fired." },
+
+    { id: "persist", phase: "pe", type: "confirmed", icon: "anchor",
+      label: "Scheduled tasks", sub: "Logon task plus a 2-hourly reinstaller",
+      technique: "T1053.005",
+      desc: "The agent persists with a logon task, \\WebViewNode, and \\RuntimeUtil every two hours, a reinstaller that re-downloads from liokida[.]com.",
+      iocs: ["\\WebViewNode", "\\RuntimeUtil", "liokida[.]com", "Local\\WUStateMgr_2f9a"] },
+
+    { id: "theft", phase: "col", type: "impact", icon: "key",
+      label: "Keylogging and theft", sub: "35 watched processes; browser, wallet, Telegram",
+      technique: "T1056.001",
+      desc: "The server pushes keyboard-monitor rules for 35 process names: browsers, wallets, password managers. The agent also offers a hidden-desktop remote viewer, webcam, a remote shell, and browser, wallet and Telegram theft uploaded as data.zip.",
+      notes: "The theft features are read from the code. The sandbox flagged credential and wallet access (wallet access at T+16 min)." },
+
+    { id: "phonelink", phase: "col", type: "suspected", icon: "mobile-screen",
+      label: "Phone Link pairing?", sub: "Fake first-run window, purpose unconfirmed",
+      technique: "",
+      desc: "The --plnag copy of the agent shows a fake Windows Phone Link first-run window whose buttons open the real app. It is probably meant to get a phone paired.",
+      notes: "Not confirmed. A run where a phone gets paired, or the code that uses a paired phone, would settle it." }
+  ],
+  edges: [
+    ["paste", "ipy"],
+    ["ipy", "timer3"],
+    ["timer3", "core"],
+    ["core", "tasks"],
+    ["tasks", "netsupport"],
+    ["tasks", "hollow"],
+    ["hollow", "persist"],
+    ["hollow", "theft"],
+    ["hollow", "phonelink", "suspected"]
+  ]
+};
+
+/* ============================ renderer ============================ */
+const $ = s => document.querySelector(s);
+const TYPE_LABEL = { confirmed: "Confirmed", suspected: "Suspected", impact: "Impact", detected: "Detection" };
+let data, active = null, hiddenTypes = new Set();
+
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+function render(d) {
+  data = d; active = null; closeDetail();
+  $("#title").textContent = d.title;
+  $("#subtitle").textContent = d.subtitle || "";
+  $("#meta").innerHTML = (d.meta || []).map(m => `<span class="meta-chip"><b>${esc(m.k)}</b>${esc(m.v)}</span>`).join("");
+
+  const types = [...new Set(d.nodes.map(n => n.type))];
+  $("#legend").innerHTML = types.map(t =>
+    `<button class="pill ${hiddenTypes.has(t) ? "off" : ""}" data-type="${t}"><span class="dot"></span>${TYPE_LABEL[t] || t}</button>`).join("");
+  $("#legend").querySelectorAll(".pill").forEach(p => p.onclick = () => {
+    const t = p.dataset.type; hiddenTypes.has(t) ? hiddenTypes.delete(t) : hiddenTypes.add(t);
+    p.classList.toggle("off"); applyFilters();
+  });
+
+  const chain = $("#chain");
+  chain.querySelectorAll(".phase").forEach(p => p.remove());
+  d.phases.forEach(ph => {
+    const col = el("div", "phase");
+    col.dataset.phase = ph.id;
+    col.appendChild(el("div", "phase-head", `<span>${esc(ph.name)}</span><small>${esc(ph.ta || "")}</small>`));
+    const body = el("div", "phase-body");
+    d.nodes.forEach((n, i) => {
+      if (n.phase !== ph.id) return;
+      const b = el("button", `node t-${n.type}`);
+      b.id = "n-" + n.id; b.dataset.id = n.id; b.type = "button";
+      b.innerHTML = `
+        <span class="node-icon"><i class="fa-solid fa-${esc(n.icon || "circle")}"></i></span>
+        <span class="node-title">${esc(n.label)}</span>
+        <span class="node-sub">${esc(n.sub || "")}</span>
+        <span class="node-foot"><span class="node-step">${String(i + 1).padStart(2, "0")}</span>${n.technique ? `<span class="node-tech">${esc(n.technique)}</span>` : ""}</span>`;
+      b.onclick = () => select(n.id);
+      body.appendChild(b);
+    });
+    col.appendChild(body);
+    chain.appendChild(col);
+  });
+  requestAnimationFrame(() => { drawEdges(); applyFilters(); });
+}
+
+function nodeEl(id) { return document.getElementById("n-" + id); }
+function nodeById(id) { return data.nodes.find(n => n.id === id); }
+
+function drawEdges() {
+  const layer = $("#edgeLayer"); layer.innerHTML = "";
+  const base = $("#chain").getBoundingClientRect();
+  data.edges.forEach(([from, to, kind], i) => {
+    const a = nodeEl(from), b = nodeEl(to);
+    if (!a || !b || a.classList.contains("hidden") || b.classList.contains("hidden")) return;
+    const k = kind || nodeById(to).type;
+    const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const sameCol = a.closest(".phase") === b.closest(".phase");
+    let d;
+    if (sameCol) {
+      const sibs = [...a.closest(".phase-body").children].filter(n => !n.classList.contains("hidden"));
+      const adjacent = Math.abs(sibs.indexOf(a) - sibs.indexOf(b)) === 1;
+      if (adjacent) {
+        const down = ra.top < rb.top;
+        const x1 = ra.left + ra.width / 2 - base.left, y1 = (down ? ra.bottom : ra.top) - base.top;
+        const x2 = rb.left + rb.width / 2 - base.left, y2 = (down ? rb.top : rb.bottom) - base.top;
+        const dy = Math.max(14, Math.abs(y2 - y1) / 2) * (down ? 1 : -1);
+        d = `M${x1} ${y1} C${x1} ${y1 + dy},${x2} ${y2 - dy},${x2} ${y2}`;
+      } else {
+        /* something sits in between: bow out into the left gutter so the line doesn't cross it
+           (incoming edges are usually sparser there than outgoing ones on the right) */
+        const x1 = ra.left - base.left, y1 = ra.top + ra.height / 2 - base.top;
+        const x2 = rb.left - base.left - 2, y2 = rb.top + rb.height / 2 - base.top;
+        const bow = 46;
+        d = `M${x1} ${y1} C${x1 - bow} ${y1},${x2 - bow} ${y2},${x2} ${y2}`;
+      }
+    } else {
+      const x1 = ra.right - base.left, y1 = ra.top + ra.height / 2 - base.top;
+      const x2 = rb.left - base.left - 2, y2 = rb.top + rb.height / 2 - base.top;
+      const dx = Math.max(36, Math.abs(x2 - x1) / 2);
+      d = `M${x1} ${y1} C${x1 + dx} ${y1},${x2 - dx} ${y2},${x2} ${y2}`;
+    }
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", d);
+    p.setAttribute("class", `edge ${k === "suspected" ? "suspected" : "flow"}`);
+    p.setAttribute("marker-end", `url(#ah-${k})`);
+    p.style.setProperty("--c", { confirmed: "#00d4ff", suspected: "#ffaa00", impact: "#ff3366", detected: "#00ffaa" }[k] || "#00d4ff");
+    p.dataset.from = from; p.dataset.to = to;
+    layer.appendChild(p);
+  });
+  if (active) trace(active);
+}
+
+function applyFilters() {
+  data.nodes.forEach(n => nodeEl(n.id).classList.toggle("hidden", hiddenTypes.has(n.type)));
+  drawEdges();
+}
+
+/* walk both directions to light up the whole path through a node */
+function pathOf(id) {
+  const up = new Set([id]), down = new Set([id]);
+  let grew = true;
+  while (grew) { grew = false; data.edges.forEach(([f, t]) => { if (up.has(t) && !up.has(f)) { up.add(f); grew = true; } }); }
+  grew = true;
+  while (grew) { grew = false; data.edges.forEach(([f, t]) => { if (down.has(f) && !down.has(t)) { down.add(t); grew = true; } }); }
+  return new Set([...up, ...down]);
+}
+
+function trace(id) {
+  const keep = pathOf(id);
+  document.querySelectorAll(".node").forEach(n => { n.classList.toggle("dim", !keep.has(n.dataset.id)); n.classList.toggle("active", n.dataset.id === id); });
+  document.querySelectorAll(".edge").forEach(e => {
+    const on = keep.has(e.dataset.from) && keep.has(e.dataset.to);
+    e.classList.toggle("dim", !on); e.classList.toggle("hot", on);
+  });
+}
+
+function clearTrace() {
+  active = null;
+  document.querySelectorAll(".node").forEach(n => n.classList.remove("dim", "active"));
+  document.querySelectorAll(".edge").forEach(e => e.classList.remove("dim", "hot"));
+  closeDetail();
+}
+
+function select(id) {
+  active = id; trace(id);
+  const n = nodeById(id), idx = data.nodes.indexOf(n) + 1;
+  const t = n.technique ? `<a href="https://attack.mitre.org/techniques/${n.technique.replace(".", "/")}/" target="_blank" rel="noopener">${esc(n.technique)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : "";
+  const ph = data.phases.find(p => p.id === n.phase);
+  const prev = data.edges.filter(e => e[1] === id).map(e => e[0]), next = data.edges.filter(e => e[0] === id).map(e => e[1]);
+  const link = i => `<button data-go="${i}">${esc(nodeById(i).label)}</button>`;
+  const copyRow = v => `<div class="ioc-row"><code>${esc(v)}</code><button class="copy-btn" data-copy="${esc(v)}" title="Copy"><i class="fa-regular fa-copy"></i></button></div>`;
+  $("#detail").innerHTML = `
+    <button class="detail-close" id="dClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <span class="badge" style="--c:var(--${{ confirmed: "primary", suspected: "warning", impact: "danger", detected: "success" }[n.type]})">${TYPE_LABEL[n.type]}</span>
+    <h2>${String(idx).padStart(2, "0")} // ${esc(n.label)}</h2>
+    <div class="tech d-text">${esc(ph ? ph.name : "")}${t ? " &middot; " + t : ""}</div>
+    ${n.desc ? `<div class="d-block"><div class="d-label"><i class="fa-solid fa-align-left"></i> What happened</div><div class="d-text">${esc(n.desc)}</div></div>` : ""}
+    ${n.iocs && n.iocs.length ? `<div class="d-block"><div class="d-label"><i class="fa-solid fa-fingerprint"></i> IOCs</div>${n.iocs.map(copyRow).join("")}</div>` : ""}
+    ${n.detection ? `<div class="d-block"><div class="d-label"><i class="fa-solid fa-magnifying-glass"></i> Detection</div>
+      <div class="terminal-box"><span class="prompt">KQL&gt;</span><span class="command">${esc(n.detection)}</span><button class="copy-btn" data-copy="${esc(n.detection)}" title="Copy"><i class="fa-regular fa-copy"></i></button></div></div>` : ""}
+    ${n.notes ? `<div class="d-block"><div class="d-label"><i class="fa-solid fa-triangle-exclamation"></i> Notes</div><div class="d-note">${esc(n.notes)}</div></div>` : ""}
+    ${prev.length || next.length ? `<div class="d-block"><div class="d-label"><i class="fa-solid fa-route"></i> Path</div>
+      <div class="flow-links">${prev.map(i => "&larr; " + link(i)).join("")}${next.map(i => link(i) + " &rarr;").join("")}</div></div>` : ""}`;
+  $("#detail").classList.add("open");
+  $("#dClose").onclick = clearTrace;
+  $("#detail").querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go));
+  $("#detail").querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
+    navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(() => { b.classList.add("copied"); setTimeout(() => b.classList.remove("copied"), 900); });
+  });
+}
+function closeDetail() { $("#detail").classList.remove("open"); }
+
+/* editor */
+$("#btnEdit").onclick = () => { $("#editor").classList.toggle("open"); $("#json").value = JSON.stringify(data, null, 2); $("#err").textContent = ""; };
+$("#btnApply").onclick = () => {
+  try { const d = JSON.parse($("#json").value); if (!d.nodes || !d.phases || !d.edges) throw new Error("needs phases, nodes, edges"); render(d); $("#err").textContent = ""; }
+  catch (e) { $("#err").textContent = "JSON error: " + e.message; }
+};
+$("#btnCopyJson").onclick = () => navigator.clipboard && navigator.clipboard.writeText($("#json").value);
+$("#btnClear").onclick = clearTrace;
+document.addEventListener("keydown", e => { if (e.key === "Escape") clearTrace(); });
+window.addEventListener("resize", () => drawEdges());
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => drawEdges());
+
+render(CHAIN);
+</script>
+</body>
+</html>

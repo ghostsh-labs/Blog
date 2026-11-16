@@ -6,11 +6,14 @@ Live site: **https://ghostsh-labs.github.io/Blog/**
 
 Writeups page: **https://ghostsh-labs.github.io/Blog/writeups.html**
 
-- [CastleRat Delivery Chain](https://ghostsh-labs.github.io/Blog/writeups.html#castle-rat-delivery-chain)
-- [Ditto DLL Side-Loading and Domain Compromise](https://ghostsh-labs.github.io/Blog/writeups.html#ditto-delivery-chain)
-- [ClickFix to CLR RAT Delivery Chain](https://ghostsh-labs.github.io/Blog/writeups.html#clickfix-clr-rat)
-- [Teams ClickFix to a Sideloaded Backdoor and rclone Exfiltration](https://ghostsh-labs.github.io/Blog/writeups.html#teams-clickfix-sideload-rclone)
+<!-- writeups:start -->
 - [ClickFix finger Lure to CastleLoader and a Hollowed node.exe Agent](https://ghostsh-labs.github.io/Blog/writeups.html#castleloader-finger-hollowed-agent)
+- [A Signed Note App with a Backdoor in app.asar, Reused Across Campaigns](https://ghostsh-labs.github.io/Blog/writeups.html#flomo-asar-backdoor-reuse)
+- [Teams ClickFix to a Sideloaded Backdoor and rclone Exfiltration](https://ghostsh-labs.github.io/Blog/writeups.html#teams-clickfix-sideload-rclone)
+- [CastleRat Delivery Chain](https://ghostsh-labs.github.io/Blog/writeups.html#castle-rat-delivery-chain)
+- [ClickFix to CLR RAT Delivery Chain](https://ghostsh-labs.github.io/Blog/writeups.html#clickfix-clr-rat)
+- [Ditto DLL Side-Loading and Domain Compromise](https://ghostsh-labs.github.io/Blog/writeups.html#ditto-delivery-chain)
+<!-- writeups:end -->
 
 Incident writeups, IOCs and detections, plus a command toolkit and a DFIR artifact reference.
 

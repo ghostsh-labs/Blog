@@ -1,0 +1,97 @@
+const CHAIN = {
+  title: "Teams ClickFix to a Sideloaded Backdoor and rclone Exfiltration",
+  subtitle: "A fake help desk on Teams, a pasted one-liner, a signed app with a patched DLL, and 2.7 GB uploaded with rclone seven hours later.",
+  meta: [
+    { k: "Source", v: "Sanitized IR case" },
+    { k: "Family", v: "CNCMachineRMS" },
+    { k: "Published", v: "2026-10-05" },
+    { k: "Contained", v: "36 min after first high alert" },
+    { k: "Open", v: "Exact file list" }
+  ],
+  phases: [
+    { id: "ia",  name: "Initial Access",    ta: "TA0001" },
+    { id: "ex",  name: "Execution",         ta: "TA0002" },
+    { id: "de",  name: "Defense Evasion",   ta: "TA0005" },
+    { id: "per", name: "Persistence",       ta: "TA0003" },
+    { id: "c2",  name: "Command & Control", ta: "TA0011" },
+    { id: "exf", name: "Exfiltration",      ta: "TA0010" }
+  ],
+  nodes: [
+    { id: "lure", phase: "ia", type: "confirmed", icon: "comments",
+      label: "Fake help desk on Teams", sub: "External account messages the user 7 min before",
+      technique: "T1566.003",
+      desc: "An external account posing as the help desk messaged the user about seven minutes before the command ran. Just before the paste the user ran two net group /dom lookups in PowerShell, which looks like live coaching.",
+      notes: "The coaching is inference: we have alert data, not the chat." },
+
+    { id: "paste", phase: "ex", type: "confirmed", icon: "paste",
+      label: "PowerShell paste", sub: "One-liner downloads a ZIP and runs the MSI inside",
+      technique: "T1204.004",
+      desc: "The pasted one-liner downloads Secure-PDFDiamond.zip, unpacks it, runs the MSI with msiexec and deletes the ZIP. The MSI writes 23 executables and DLLs to a FileLocator Index Manager folder and launches the signed IndexManager.exe.",
+      iocs: ["hxxps://justchillbahrein[.]com/Secure-PDFDiamond.zip", "93.157.138[.]177",
+             "1103f25776348f38cd606f98f1b0d802f4c800b2b9942d58a83b94883d23b1cb",
+             "%LOCALAPPDATA%\\Programs\\FileLocator Index Manager\\"] },
+
+    { id: "sideload", phase: "de", type: "confirmed", icon: "file-signature",
+      label: "Signed app, patched DLL", sub: "IndexManager.exe loads a DLL patched after signing",
+      technique: "T1574.001",
+      desc: "ConfigUILib.dll is a genuine vendor DLL patched after signing to import apiModel.dll. Its recomputed Authenticode digest doesn't match its signature, while IndexManager.exe and SearchLib.dll do.",
+      iocs: ["03497e8aa5627f4f7df7414051cc395a6c09813d64a554df16af64e21ac9d1d7",
+             "4337f8c12c0ec3aae176e3d0d3b655643384167a18d1189d227580430ccbf0d8"],
+      notes: "High for the files. I have no image-load event for the runtime load, so that half stays assessed." },
+
+    { id: "wav", phase: "de", type: "confirmed", icon: "file-audio",
+      label: "Payload in a WAV file", sub: "XOR-decoded shellcode, run after a 62 s wait",
+      technique: "T1620",
+      desc: "apiModel.dll starts a thread on load, reads 341,475 bytes from offset 0x30cea of LibraryPipelines.wav, XOR-decodes them, sleeps 62 seconds, and runs the result from an RWX buffer by passing it to EnumSystemCodePagesW as a callback. Reproducing the decoder in Python turned entropy 7.39 into x64 code.",
+      iocs: ["f5c2846239a2d6143bc0686f68161284eb728b53fe756c00c418c4364b87df0a",
+             "9f03b58b46253bb533104b38257b867bf60a9318f51e1471e17b2a7fa12dfe9b",
+             "fd2b72d1a59a2c1d9d5d231f646153efe2a8ca981a37609b5d726d6c6f0cdeab"] },
+
+    { id: "script", phase: "per", type: "confirmed", icon: "anchor",
+      label: "Script sets persistence", sub: "Run key and task on timers, then loads the implant",
+      technique: "T1547.001",
+      desc: "The decoded blob opens Compress.db, a custom container of 1,128 entries whose main entry is a script. It re-creates the Run key every 150 seconds and the task every 875 seconds, then loads the real implant, a 1.58 MB blob. Both entries point at the host process, so every restart re-runs the sideload.",
+      iocs: ["HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run  \"FL Smart Index Manager\"",
+             "Scheduled task \"FL Smart Index Manager\"",
+             "181b024e65858d9d7fb1ef110eb554791fd60436906248cd51e62d8598c66d34"],
+      notes: "Medium: the Run key at T+4 and the task at T+16 match the script's timers, but that is a timing match, not a log of the script firing." },
+
+    { id: "block", phase: "per", type: "detected", icon: "shield-halved",
+      label: "Defender block at T+5", sub: "Persistence blocked once; the loop puts it back",
+      technique: "",
+      desc: "Defender blocked a persistence behavior at T+5 (low severity), yet the backdoor was back at the next sign-in. The script's loops explain why persistence survived the block." },
+
+    { id: "c2", phase: "c2", type: "confirmed", icon: "tower-broadcast",
+      label: "HTTPS C2, DoH lookups", sub: "IndexManager.exe connects out at T+2 min",
+      technique: "T1071.001",
+      desc: "Two minutes after install the process connected out over HTTPS and queried a public DNS-over-HTTPS resolver directly, bypassing the organization's DNS logs. The implant matches public reporting on the CNCMachineRMS framework.",
+      iocs: ["91.92.33[.]24:443", "8f6dbc8f53b181da32a02e5c1a49d026ad225f72d2a646e66248aa3ffdd5449e"],
+      notes: "The C2 address comes from telemetry; I never recovered the gate from the binaries. High for family, nothing for an actor." },
+
+    { id: "rclone", phase: "exf", type: "impact", icon: "cloud-arrow-up",
+      label: "rclone to IDrive e2", sub: "About 2.7 GB in two 15-minute windows",
+      technique: "T1567.002",
+      desc: "Six quiet hours later a shell ran net use, net view against a file server and ipconfig /all, and the host process wrote rclone.exe into the user's Music folder. The commands were stock rclone: config create for an IDrive e2 remote, then copy with --include filters. Defender's DLP telemetry named 334 files, 32 tagged as exfiltrated; given the byte count I treat all 334 as sent.",
+      iocs: ["s3.us-central-1.idrivee2[.]com", "76.8.23[.]66",
+             "033eee51c9ad47c2de2624b6674d355274bcd6cf0027a5f85db4437ba24ae81c",
+             "%USERPROFILE%\\Music\\rclone.exe"],
+      notes: "Open: the exact file list (the file server's audit log is the authority) and whether the copy was downloaded elsewhere." },
+
+    { id: "alert", phase: "exf", type: "detected", icon: "shield-halved",
+      label: "Alert, then isolation", sub: "High alert in the same second; isolated at T+7 h 36",
+      technique: "",
+      desc: "The first rclone run raised a high-severity exfiltration alert in the same second and Defender stopped it three minutes on. The operator swapped in a renamed build, iclone.exe, which Defender flagged for its mismatched original filename, then a second one. The SOC isolated the host 36 minutes after the first high-severity alert.",
+      iocs: ["22f62fa53abf6c30e0e36acc41eebb90af8ee6072001e846fa13cfc3077f6ed7",
+             "4779b229343510429eddd4a8e3cad028a2b395cb7e6c05c588525df2c98143df"] }
+  ],
+  edges: [
+    ["lure", "paste"],
+    ["paste", "sideload"],
+    ["sideload", "wav"],
+    ["wav", "script"],
+    ["script", "block", "detected"],
+    ["script", "c2"],
+    ["c2", "rclone"],
+    ["rclone", "alert", "detected"]
+  ]
+};

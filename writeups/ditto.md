@@ -30,6 +30,8 @@ TTC     : ~30 min to KRBTGT, 48 min to multi-host persistence
 
 ## Attack Chain
 
+**[Open the interactive attack chain](ditto-delivery-chain.html)**: click a step for its evidence and IOCs.
+
 ```
 Vishing call → Quick Assist session → recon
   → pd_53updates.msi → pdf24.exe + userenv.dll (blocked)
@@ -58,55 +60,32 @@ An over-privileged service account made the rest trivial. The operator used it t
 Relative to the Quick Assist session starting.
 
 ```
-T+0     Quick Assist session established
-T+7     Stage 1 MSI downloaded
-T+9     Stage 1 side-load blocked
-T+10    Stage 2 MSI downloaded, Ditto installed
-T+18    PetitPotam against the DC
-T+30    DCSync observed
-T+40    RDP to second host
-T+45    RDP to third host
-T+48    GetScreen / DWAgent persistence on both
+T+0        Quick Assist session established
+T+7 min    Stage 1 MSI downloaded
+T+9 min    Stage 1 side-load blocked
+T+10 min   Stage 2 MSI downloaded, Ditto installed
+T+18 min   PetitPotam against the DC
+T+30 min   DCSync observed
+T+40 min   RDP to second host
+T+45 min   RDP to third host
+T+48 min   GetScreen / DWAgent persistence on both
 ```
 
 ## How I know
 
 - **Both payloads are the same family.** The quarantined Stage 1 `userenv.dll` and the fake `vcruntime140.dll` share the same strings: Botan 3 AES-256/GCM, `GCC: (GNU) 13-win32`, the same base64 C2 and the same implant GUID. Static strings from both files. High.
 - **It's a side-load, not a replaced runtime.** `Ditto.exe` sits beside a `vcruntime140.dll` whose hash and strings are the implant's. Windows prefers the application directory in the DLL search order. High.
-- **The C2 is DNS-as-transport.** The destination was an external IP on UDP/53, not a corporate or public resolver, and the packet contents weren't valid DNS queries. High. The AES-GCM wrapping comes from the Botan strings and the beacon template; I didn't decrypt traffic, so moderate.
+- **The C2 is DNS-as-transport.** The destination was an external IP on UDP/53, not a corporate or public resolver, and the packet contents weren't valid DNS queries. High. The AES-GCM wrapping comes from the Botan strings and the beacon template; I didn't decrypt traffic, so Medium.
 - **PetitPotam and relay.** I found this hunting for PetitPotam in Advanced Hunting: EFSRPC pipe (`\PIPE\efsrpc`) activity against the DC, then the DC making an outbound connection to a DigitalOcean-hosted VPS. High on the coercion. The relay is inferred from that outbound connection, and the relay target isn't confirmed.
 - **DCSync.** `DRSGetNCChanges` from a workstation to a DC. A workstation doesn't replicate directory data. High. I'm treating KRBTGT as compromised because the replication request covers it.
 
 ## Detection
 
-Written for Defender XDR Advanced Hunting. They also run in Sentinel where the Defender XDR connector streams the table (`Timestamp` exists in both).
-
-```kql
-// Ditto: VC++ runtime DLLs loaded from a user-writable app folder
-// Status: untested. Expect noise from legitimate portable apps; tune by publisher or hash
-DeviceImageLoadEvents
-| where FileName in~ ("vcruntime140.dll", "mfc140u.dll", "msvcp140.dll")
-| where FolderPath has @"\AppData\Local\"
-| where InitiatingProcessFolderPath has @"\AppData\Local\"
-| project Timestamp, DeviceName, InitiatingProcessFileName, InitiatingProcessFolderPath,
-          FileName, FolderPath, SHA1
-```
-
-```kql
-// Ditto: directory replication requested by a machine that is not a domain controller (DCSync)
-// Status: untested. Fill in your DC list; the ActionType string is unconfirmed, check the portal schema,
-// and confirm which column carries the source host in your tenant
-let DomainControllers = dynamic(["dc1.example.local", "dc2.example.local"]);
-IdentityDirectoryEvents
-| where ActionType has "replication"
-| where DeviceName !in~ (DomainControllers)
-| project Timestamp, DeviceName, IPAddress, AccountName, ActionType, AdditionalFields
-```
-
-- Defender caught Stage 1 as `Potential Side-Loaded Behavior Was Blocked`. Stage 2 wasn't caught, which is why the image-load query above matters. Keep that alert routed to the SOC rather than just blocked.
+- Defender caught Stage 1 as `Potential Side-Loaded Behavior Was Blocked`; Stage 2 wasn't caught. Keep that alert routed to the SOC rather than just blocked.
+- `vcruntime140.dll` loaded from an app folder under `%LOCALAPPDATA%` instead of System32 is the side-load. Portable apps do this too, so pair it with a Startup `.lnk` created the same day.
 - UDP/53 to an IP that isn't one of your resolvers is a cheap tell. Malformed query structure confirms it.
-- `msiexec` launching an MSI from a user-writable path or an external download within minutes of a Quick Assist session starting.
-- A Startup-folder `.lnk` created the same day as an app folder under `%LOCALAPPDATA%` that contains runtime DLLs.
+- `msiexec` launching an MSI from an external download within minutes of a Quick Assist session starting.
+- Directory replication (`DRSGetNCChanges`) requested by a machine that isn't a domain controller is DCSync.
 
 ## ATT&CK
 

@@ -10,3 +10,5 @@ Desktop.ini
 # Python
 __pycache__/
 *.pyc
+# make_chain.py --check screenshots
+*.check.png

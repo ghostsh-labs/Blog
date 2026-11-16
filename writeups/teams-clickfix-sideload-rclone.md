@@ -29,6 +29,8 @@ TTC     : 36 min from first high-severity alert to isolation
 
 ## Attack Chain
 
+**[Open the interactive attack chain](teams-clickfix-sideload-rclone-chain.html)**: click a step for its evidence and IOCs.
+
 ```
 External Teams "help desk" → user pastes PowerShell one-liner
   → hxxps://justchillbahrein[.]com/Secure-PDFDiamond.zip → msiexec /i
@@ -62,53 +64,33 @@ The decoded blob opens `Compress.db`, a custom container of 1,128 entries whose 
 
 T is the moment the pasted command ran.
 
-| Time | What happened |
-| --- | --- |
-| T−7 to T−2 min | Teams message from the "help desk"; two `net group /dom` lookups |
-| T+0 | Pasted one-liner installs the MSI |
-| T+2 min | First HTTPS connection to the C2 IP; DoH lookups |
-| T+4 / T+5 min | Run key written; Defender blocks a persistence behavior (low) |
-| T+16 min | Scheduled task created |
-| T+6 h 20 min | `net use`, `net view`, `ipconfig /all` |
-| T+6 h 57 min | `rclone.exe` dropped |
-| T+7 h | First rclone run; high-severity alert; Defender stops it at T+7 h 3 min |
-| T+7 h 7 min | Renamed `iclone.exe` runs; a second build is swapped in at T+7 h 26 min |
-| T+7 h 36 min | SOC isolates the machine |
-| Next day | Backdoor restarts at sign-in; the isolated host makes no C2 connection |
+```
+T−7 to T−2 min   Teams message from the "help desk"; two net group /dom lookups
+T+0              Pasted one-liner installs the MSI
+T+2 min          First HTTPS connection to the C2 IP; DoH lookups
+T+4 / T+5 min    Run key written; Defender blocks a persistence behavior (low)
+T+16 min         Scheduled task created
+T+6 h 20 min     net use, net view, ipconfig /all
+T+6 h 57 min     rclone.exe dropped
+T+7 h            First rclone run; high-severity alert; Defender stops it at T+7 h 3 min
+T+7 h 7 min      Renamed iclone.exe runs; a second build is swapped in at T+7 h 26 min
+T+7 h 36 min     SOC isolates the machine
+Next day         Backdoor restarts at sign-in; the isolated host makes no C2 connection
+```
 
 ## How I know
 
 - **The sideload chain is real.** Signed `ConfigUILib.dll` imports unsigned `apiModel.dll`, and its recomputed Authenticode digest doesn't match its signature while the controls, `IndexManager.exe` and `SearchLib.dll`, do. High for the files; I have no image-load event for the runtime load, so that half stays assessed.
 - **The payload is in the WAV.** Ghidra gave the offset, length and decoder; reproducing it in Python turned entropy 7.39 into x64 code (5.54) with a normal function prologue. High.
-- **The persistence timing fits the script.** A 62-second wait ending near T+2 plus the 150 s and 875 s timers predicts a Run key near T+4 and a task near T+16, which is what telemetry shows, and the loops explain why persistence survived the T+5 block. Medium-high: a timing match, not a log of the script firing.
+- **The persistence timing fits the script.** A 62-second wait ending near T+2 plus the 150 s and 875 s timers predicts a Run key near T+4 and a task near T+16, which is what telemetry shows, and the loops explain why persistence survived the T+5 block. Medium: a timing match, not a log of the script firing.
 - **The family is CNCMachineRMS.** `CNCMachineRMS\tasks` decrypts out of the implant, and the script syntax, DoH trio and container layout match LevelBlue SpiderLabs and Huntress reporting. High for family, nothing for an actor. The C2 address comes from telemetry; I never recovered the gate from the binaries, and the `CRATER_HOMEDIR\hryak_packages_x64` build path leaked in a log inside the MSI has no public hits.
 
 ## Detection
 
-Written for Defender XDR Advanced Hunting. They also run in Sentinel where the Defender XDR connector streams the table (`Timestamp` exists in both).
-
-```kql
-// rclone, including renamed builds: original filename differs from the name on disk, or S3-style copy flags
-// Status: untested
-DeviceProcessEvents
-| where (ProcessVersionInfoOriginalFileName =~ "rclone.exe" and FileName !~ "rclone.exe")
-    or (ProcessCommandLine has_all ("copy", "--include", "--max-age", "--transfers"))
-| project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine,
-          InitiatingProcessFileName, InitiatingProcessFolderPath
-```
-
-```kql
-// A non-browser process connecting to a public DNS-over-HTTPS resolver
-// Status: untested (RemoteUrl can be empty when only an IP was logged)
-DeviceNetworkEvents
-| where ActionType == "ConnectionSuccess"
-| where RemoteUrl has_any ("dns.google", "cloudflare-dns.com", "dns.quad9.net")
-| where InitiatingProcessFileName !in~ ("chrome.exe", "msedge.exe", "firefox.exe", "brave.exe")
-| summarize Connections = count(), FirstSeen = min(Timestamp)
-    by DeviceName, InitiatingProcessFileName, InitiatingProcessFolderPath
-```
-
-- An image load of `apiModel.dll` or `RegisterIdr.dll` by `IndexManager.exe` is high-signal; I haven't tested a `DeviceImageLoadEvents` query for it.
+- A binary whose original filename is `rclone.exe` running under another name (here `iclone.exe`) is a renamed build. Defender flagged exactly that mismatch.
+- `rclone` run with `config create` and then `copy` with `--include` filters, from a user's Music folder, is staging for upload.
+- A non-browser process connecting to a public DNS-over-HTTPS resolver (`dns[.]google`, `cloudflare-dns[.]com`, `dns[.]quad9[.]net`). Here it was `IndexManager.exe`.
+- An image load of `apiModel.dll` or `RegisterIdr.dll` by `IndexManager.exe` is high-signal.
 - A Run key or task that reappears within minutes of deletion is a loop. Kill the process first, then remove both.
 
 ## ATT&CK

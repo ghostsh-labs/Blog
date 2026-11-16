@@ -1536,6 +1536,16 @@ footer {
     color: var(--accent);
 }
 
+.writeup-body a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.writeup-body a:hover {
+    color: var(--accent);
+}
+
 .writeup-body h3 {
     color: var(--light);
     font-size: 0.9rem;
@@ -1667,4 +1677,82 @@ footer {
     .about-card {
         padding: 1.25rem;
     }
+}
+
+/* Home intro + actions */
+.hero-intro {
+    max-width: 640px;
+    margin: 0 auto 1.25rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--light);
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: all var(--transition);
+}
+
+.hero-btn:hover {
+    border-color: rgba(0, 212, 255, 0.5);
+    background: rgba(0, 212, 255, 0.08);
+}
+
+.hero-btn.primary {
+    background: rgba(0, 212, 255, 0.12);
+    border-color: rgba(0, 212, 255, 0.45);
+    color: var(--primary);
+}
+
+/* About extras */
+.about-card p + p {
+    margin-top: 0.75rem;
+}
+
+.about-card li {
+    margin-bottom: 0.35rem;
+}
+
+.about-card h2 {
+    scroll-margin-top: 5rem;
+}
+
+.about-project {
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 1rem 1.1rem;
+    margin-top: 0.75rem;
+}
+
+.about-project h3 {
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin-bottom: 0.35rem;
+}
+
+.about-project p {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.about-note {
+    font-size: 0.8rem;
+    color: var(--muted);
 }

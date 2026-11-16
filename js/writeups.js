@@ -154,7 +154,10 @@
             return;
         }
 
-        const allTags = [...new Set(window.GHOST_WRITEUPS.flatMap((w) => w.tags))].sort();
+        // One-off tags stay searchable but would only clutter the chip row.
+        const counts = {};
+        window.GHOST_WRITEUPS.forEach((w) => w.tags.forEach((t) => { counts[t] = (counts[t] || 0) + 1; }));
+        const allTags = Object.keys(counts).filter((t) => counts[t] >= 2).sort();
         container.innerHTML =
             '<button class="filter-tag active" data-tag="all">All</button>' +
             allTags.map((t) => `<button class="filter-tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</button>`).join('');

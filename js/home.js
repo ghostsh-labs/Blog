@@ -44,7 +44,7 @@
             return;
         }
 
-        const [latest, ...rest] = writeups.slice(0, 4);
+        const [latest, ...rest] = writeups.slice(0, 6);
         container.innerHTML =
             renderFeature(latest) +
             `<div class="writeup-list">${rest.map(renderRow).join('')}</div>`;

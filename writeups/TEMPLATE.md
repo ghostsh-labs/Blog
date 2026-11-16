@@ -37,11 +37,19 @@ Same order every post. Drop a section if it doesn't apply; don't rename it.
    IMPACT  :
    ```
    Optional `TTC` line only with real timestamps.
-3. `## Attack Chain`: the arrow diagram, kept tight.
+3. `## Attack Chain`: the link to the interactive chain, then the arrow diagram, kept tight.
+   ```
+   **[Open the interactive attack chain](<id>-chain.html)**: click a step for its evidence and IOCs.
+   ```
+   Copy `chains/castleloader-finger-hollowed-agent.js` to `chains/<id>.js` (`<id>` is the frontmatter id), fill it in, run `python make_chain.py <id> --check` inside `blog\`. It must report no errors. (An id that already ends in `-chain` builds `<id>.html`, not `<id>-chain.html`.)
+   - Same facts as the post, nothing new. IOCs and ATT&CK IDs are copied from the post, defanged.
+   - Columns are ATT&CK tactics, left to right in the order it happened. Steps are numbered in list order.
+   - `confirmed` needs evidence in the post. Anything unproven is `suspected`, with a note saying what would confirm it. `impact` is the damage, `detected` is where a detection fired.
+   - `label` under 25 characters, `sub` under 60.
 4. `## What happened`: the story and what you found. Add one extra `##` section for the interesting part, if there is one.
-5. `## Timeline`: only with real timestamps, as T+ minutes.
-6. `## How I know`: 3-5 bullets. Each one: evidence, tool or data source, finding, confidence.
-7. `## Detection`: one line saying the queries target Defender XDR Advanced Hunting (they run in Sentinel too where the connector streams the table), then 1-2 KQL queries, each commented and marked `Status: tested against case data` or `Status: untested`. Check table, column and ActionType names against Microsoft's schema docs. Then 2-3 bullets for detections that aren't KQL.
+5. `## Timeline`: only with real timestamps, in a code block, as `T+7 min` / `T+6 h 20 min`. Say what T is.
+6. `## How I know`: 3-5 bullets. Each one: evidence, tool or data source, finding, confidence. Confidence is `High`, `Medium` or `Low`; write `Open:` for what you couldn't answer.
+7. `## Detection`: 3-5 bullets. Each is a behavior from this case a defender could hunt or alert on, specific enough to act on (process, path, command line, port). No generic advice. No KQL unless it has been run against real data; then one query, commented, marked `Status: tested against case data`.
 8. `## ATT&CK`: `| ID | Technique | Where |`. Verify every ID on attack.mitre.org; IDs get merged (T1574.002 is now T1574.001).
 9. `## IOCs`: `### Network`, `### Hashes`, `### Host`, in code blocks. Defang everywhere, including prose and the attack chain: `hxxp://`, `1.2.3[.]4`, `example[.]com`. Leave hashes as-is.
 

@@ -1,0 +1,63 @@
+# Attack chain image spec. Not built: build_chain.py skips TEMPLATE*.
+# Copy to <writeup id>.toml (same id as the post's frontmatter), fill it in, then:
+#   python build_chain.py <writeup id>
+# Output: writeups/assets/<writeup id>-chain.png
+#
+# Rules
+# - 5-9 stages, in the order it happened. Same facts as the post, nothing new.
+# - title: what happened, 6 words max. detail: 1-2 lines, evidence only
+#   (files, commands, IOCs). Short phrases, no sentences.
+# - `backticks` mark files, commands and IOCs. Defang everything; the build warns
+#   on live URLs, IPs and domains.
+# - time: T+ relative, only with real timestamps (same rule as ## Timeline).
+#   Leave it out when unknown.
+# - attack: IDs from the post's ATT&CK table only; the build warns on extras.
+# - No client names, hostnames, usernames or internal IPs.
+#
+# Phases (fixed colors, don't add new ones)
+#   access · execution · evasion · privesc · persistence · discovery
+#   credential · lateral · c2 · collection · exfil · impact
+# Defender events (green, shield icon): use `defender` instead of `phase`
+#   blocked · detected · response
+
+# Title comes from the writeup. Set `title` here only to override it.
+subtitle = "One-line scope: hosts hit · paste to containment · outcome"
+t0 = "T = the moment the pasted command ran"
+
+[[stage]]
+phase = "access"
+time = "T−5 min"
+title = "Lure that got the user"
+detail = "how the user was reached; `defanged[.]domain` if any"
+attack = ["T1566"]
+
+[[stage]]
+phase = "execution"
+time = "T+0"
+title = "What actually ran"
+detail = [
+  "`hxxps://payload[.]example/stage.zip`",
+  "→ `msiexec /i` → where it landed",
+]
+attack = ["T1204.004"]
+
+  # Side box: a branch off this stage. Use for defender events, a blocked
+  # attempt, or a second payload that doesn't continue the main chain.
+  [[stage.side]]
+  defender = "blocked"
+  time = "T+1 min"
+  title = "What the control stopped"
+  detail = "and what happened next"
+
+[[stage]]
+phase = "c2"
+time = "T+2 min"
+title = "Implant phones home"
+detail = "HTTPS to `203.0.113[.]10:443`"
+attack = ["T1071.001"]
+
+[[stage]]
+defender = "response"
+time = "T+40 min"
+title = "Host isolated"
+detail = "what was contained and reset"

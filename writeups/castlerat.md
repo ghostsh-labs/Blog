@@ -28,6 +28,8 @@ IMPACT  : Stealer + RAT: browsers, wallets, password managers, screenshots
 
 ## Attack Chain
 
+**[Open the interactive attack chain](castle-rat-delivery-chain.html)**: click a step for its evidence and IOCs.
+
 ```
 CAPTCHA paste → cmd.exe
   → cmdkey + schtasks /XML from \\195.10.205[.]171\kxc\full.xml
@@ -42,54 +44,32 @@ CAPTCHA paste → cmd.exe
 
 The paste was a one-liner that stored guest creds for an attacker SMB share and created a scheduled task, `Lowks`, from `full.xml` on that share. A trailing `REM I am not a robot - Cloudflare ID: …` made it look like CAPTCHA text. Keeping the task on the share lets the operator change what it runs without touching the lure.
 
-The task pulls a PowerShell stager from `yhofgafjle[.]com`. It's mostly hundreds of lines of dead code to dilute AMSI, with one real function that downloads `maestrovsd.exe`, a ~150KB .NET loader. The loader then fetches full signed Python runtimes (3.9 and 3.13) plus `install.pyc` and `melody.pyc`, so the process tree shows a trusted `pythonw.exe` running attacker bytecode. Elevation is the usual `ms-settings` registry hijack with `ComputerDefaults.exe`.
+The task pulls a PowerShell stager from `yhofgafjle[.]com`. It's mostly hundreds of lines of dead code to dilute AMSI, with one real function that downloads `maestrovsd.exe`, a ~150KB .NET loader. The loader then fetches full signed Python runtimes (3.9 and 3.13) plus `install.pyc` and `melody.pyc` from `162.33.177[.]16` and `adamcold[.]com`, so the process tree shows a trusted `pythonw.exe` running attacker bytecode. Elevation is the usual `ms-settings` registry hijack with `ComputerDefaults.exe`.
 
 ## The Steam dead drop
 
-This is the interesting part. The implant doesn't hardcode its C2. It fetches a Steam Community profile and reads the C2 straight out of the profile name, a plain `ip:port` with no encoding.
+This is the interesting part. The implant doesn't hardcode its C2. It fetches a Steam Community profile and reads the C2 straight out of the profile name, in plain text.
 
 ![Steam profile dead-drop resolver](assets/steam-dead-drop.png)
 
-Here it resolved to `45.88.106[.]190:4545`, with a backup at `8.3.0[.]253`. Steam traffic rarely gets blocked in most environments, and swapping infrastructure is just editing a profile. Config extraction also gave an RC4 key that decrypts two more in-memory stages (~5MB and ~15MB). The Python is PyArmor-protected, so static analysis of the `.pyc` files went nowhere.
+The run resolved `45.88.106[.]190:4545`, with a backup at `8.3.0[.]253`. When I took the screenshot the name read `nicushka[.]com`. Steam traffic rarely gets blocked in most environments, and swapping infrastructure is just editing a profile. Config extraction also gave an RC4 key that decrypts two more in-memory stages (~5MB and ~15MB). The Python is PyArmor-protected, so static analysis of the `.pyc` files went nowhere.
 
 Once it's up, it's a full stealer: Chrome, Edge and Firefox data, a long list of crypto wallets and wallet extensions, 1Password and NordPass directories, VPN configs, FTP clients, and screenshots.
 
 ## How I know
 
-- **The task came from the share.** The pasted command survived in endpoint telemetry, with `cmdkey`, `schtasks /XML` and the UNC path in one command line. High confidence. The lure page itself wasn't preserved.
+- **The task came from the share.** The pasted command survived in endpoint telemetry, with `cmdkey`, `schtasks /XML` and the UNC path in one command line. High. The lure page itself wasn't preserved.
 - **The stager is padding plus one function.** I read the script served from the stager domain: dead variables, no-op functions, and a single real download-and-run function. High. The variable names look randomized per deployment, so don't hunt on them.
 - **Python runs from `ProgramData`.** The execution trace shows signed `pythonw.exe` from two random `C:\ProgramData\` folders (Python 3.9 and 3.13) running `install.pyc` and `melody.pyc`. High.
 - **UAC bypass via `ComputerDefaults.exe`.** `pythonw.exe` spawned `ComputerDefaults.exe` at High integrity, which fits the `ms-settings` handler hijack. High on the process chain. I treated the registry rewrite as part of the technique rather than something I observed on its own.
-- **Family is CastleRat / NightShadeC2.** The sandbox verdict named both, and YARA hits on process dumps tagged both. That means the same codebase or a close fork. Moderate: this rests on those hits and infrastructure overlap, not a code comparison.
+- **Family is CastleRat / NightShadeC2.** The sandbox verdict named both, and YARA hits on process dumps tagged both. That means the same codebase or a close fork. Medium: this rests on those hits and infrastructure overlap, not a code comparison.
 
 ## Detection
 
-Written for Defender XDR Advanced Hunting. They also run in Sentinel where the Defender XDR connector streams the table (`Timestamp` exists in both).
-
-```kql
-// CastleRat: scheduled task created from an XML file on a remote SMB share
-// Status: untested
-DeviceProcessEvents
-| where FileName =~ "schtasks.exe"
-| where ProcessCommandLine has "/create" and ProcessCommandLine has "/xml"
-| where ProcessCommandLine matches regex @'(?i)/xml\s+"?\\\\[^\\]+\\'
-| project Timestamp, DeviceName, AccountName, ProcessCommandLine,
-          InitiatingProcessFileName, InitiatingProcessCommandLine
-```
-
-```kql
-// CastleRat: ComputerDefaults.exe launched by pythonw.exe running out of ProgramData
-// Status: untested
-DeviceProcessEvents
-| where FileName =~ "ComputerDefaults.exe"
-| where InitiatingProcessFileName =~ "pythonw.exe"
-| where InitiatingProcessFolderPath startswith @"C:\ProgramData\"
-| project Timestamp, DeviceName, AccountName, ProcessIntegrityLevel,
-          InitiatingProcessFolderPath, InitiatingProcessCommandLine
-```
-
-- `cmdkey /add:<ip>` followed by `schtasks /create /xml` in the same command line is a strong pair even without the UNC match.
-- A write to `...\Classes\ms-settings\Shell\Open\command` in `DeviceRegistryEvents`, followed by `ComputerDefaults.exe`, is the generic form of the UAC bypass.
+- `cmdkey /add:<ip>` followed by `schtasks /create /xml` from a UNC path, in one command line, is the paste.
+- Signed `pythonw.exe` running `.pyc` files out of a random folder under `C:\ProgramData\`.
+- `ComputerDefaults.exe` started by that `pythonw.exe` at High integrity is the UAC bypass.
+- A write to `...\Classes\ms-settings\Shell\Open\command` followed by `ComputerDefaults.exe` is the generic form of the same bypass.
 
 ## ATT&CK
 
@@ -114,11 +94,11 @@ DeviceProcessEvents
 yhofgafjle[.]com                             PowerShell stager
 162.33.177[.]16                              Payload host
 adamcold[.]com                               Payload host
-212.43.154[.]198:23814                       Initial C2
+212.43.154[.]198:23814                       First C2 in the sandbox run of maestrovsd.exe
 45.88.106[.]190:4545                         Resolved C2
 8.3.0[.]253                                  Backup C2
 steamcommunity[.]com/id/dpmorin49sdiw302fw   Dead drop
-nicushka[.]com                               Profile name shown in the screenshot (not the C2 value)
+nicushka[.]com                               Profile name at the time of the screenshot
 ```
 
 ### Hashes

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHOST - DFIR &amp; Threat Research</title>
     <meta name="description" content="DFIR &amp; threat research: incident writeups, IOCs, and detections.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="GHOST">
+    <meta property="og:title" content="GHOST - DFIR &amp; Threat Research">
+    <meta property="og:description" content="DFIR &amp; threat research: incident writeups, IOCs, and detections.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%23050508%27/%3E%3Cpath d=%27M32 10c-10 0-16 8-16 18v26l5-4 5 4 6-4 6 4 5-4 5 4V28c0-10-6-18-16-18z%27 fill=%27%2300d4ff%27/%3E%3Ccircle cx=%2725%27 cy=%2729%27 r=%273.5%27 fill=%27%23050508%27/%3E%3Ccircle cx=%2739%27 cy=%2729%27 r=%273.5%27 fill=%27%23050508%27/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#050508">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/ghost.css">
 </head>
@@ -53,6 +59,12 @@
         <section class="hero-section hero-compact">
             <h1 class="hero-title">GHOST</h1>
             <p class="hero-subtitle">DFIR &amp; threat research: incident writeups, IOCs, detections</p>
+            <p class="hero-intro">I'm an incident responder (GCFA, GCIH) in a managed SOC. This is where I publish the investigations and malware teardowns I can share: how each attack worked, what I verified versus inferred, the IOCs, and KQL to catch it.</p>
+            <div class="hero-actions">
+                <a href="writeups.html" class="hero-btn primary"><i class="fas fa-book-open"></i> Read the writeups</a>
+                <a href="about.html" class="hero-btn"><i class="fas fa-user-secret"></i> About me</a>
+                <a href="https://github.com/ghostsh-labs" class="hero-btn" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+            </div>
         </section>
 
         <section class="blog-section">
@@ -74,10 +86,15 @@
                 <h3>Artifacts</h3>
                 <p>DFIR cheat sheet - Prefetch, ShellBags, AmCache, EVTX locations</p>
             </a>
+            <a href="about.html#projects" class="quick-link-card">
+                <i class="fas fa-code-branch"></i>
+                <h3>Projects</h3>
+                <p>GHOST-IR, an offline-first incident response workspace, and other open-source work</p>
+            </a>
             <a href="about.html" class="quick-link-card">
                 <i class="fas fa-user-secret"></i>
                 <h3>About</h3>
-                <p>Who writes this, what I work on, and how to reach me</p>
+                <p>Background, certifications, and how these writeups are put together</p>
             </a>
         </section>
     </main>

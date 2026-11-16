@@ -92,7 +92,9 @@ def load_writeup(path: Path) -> dict:
         "date": meta.get("date", ""),
         "readTime": meta.get("readTime", estimate_read_time(body)),
         "tags": meta.get("tags", []),
-        "content": md_to_html(body),
+        # Posts link images relative to writeups/, but they render on writeups.html at the root.
+        # Same for the interactive chain pages (writeups/<id>-chain.html).
+        "content": re.sub(r'(src|href)="(assets/|[a-z0-9-]+-chain\.html")', r'\1="writeups/\2', md_to_html(body)),
     }
 
     if not writeup["summary"]:
@@ -104,6 +106,22 @@ def load_writeup(path: Path) -> dict:
     return writeup
 
 
+README = BASE / "README.md"
+LIVE_URL = "https://ghostsh-labs.github.io/Blog/writeups.html"
+INDEX_RE = re.compile(r"(<!-- writeups:start -->\n).*?(<!-- writeups:end -->)", re.DOTALL)
+
+
+def update_readme_index(writeups: list[dict]) -> None:
+    """Keep the README's post list in sync so it never drifts from writeups/."""
+    if not README.exists():
+        return
+    text = README.read_text(encoding="utf-8")
+    if not INDEX_RE.search(text):
+        return
+    lines = "".join(f"- [{w['title']}]({LIVE_URL}#{w['id']})\n" for w in writeups)
+    README.write_text(INDEX_RE.sub(lambda m: m.group(1) + lines + m.group(2), text), encoding="utf-8")
+
+
 def main() -> None:
     skip = {"readme.md", "template.md"}
     files = sorted(path for path in WRITEUPS_DIR.glob("*.md") if path.name.lower() not in skip)
@@ -112,6 +130,7 @@ def main() -> None:
 
     content = "window.GHOST_WRITEUPS = " + json.dumps(writeups, indent=2, ensure_ascii=False) + ";\n"
     OUTPUT.write_text(content, encoding="utf-8")
+    update_readme_index(writeups)
     print(f"Built {OUTPUT.name} with {len(writeups)} writeup(s)")
 
 
