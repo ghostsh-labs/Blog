@@ -38,11 +38,12 @@ Same order every post. Drop a section if it doesn't apply; don't rename it.
    ```
    Optional `TTC` line only with real timestamps.
 3. `## Attack Chain`: the line `<!-- chain -->`, then the arrow diagram, kept tight.
-   The site build replaces the marker with the visual chain (a vertical flow inside the post, one step per blob, click for evidence) and folds the arrow diagram under "Text version". On GitHub only the arrow diagram shows.
+   The site build replaces the marker with the visual chain (tactic columns left to right, one blob per step, arrows between them; click a step to trace its path and see the evidence) and folds the arrow diagram under "Text version". On GitHub only the arrow diagram shows.
    Chain data is `chains/<id>.json` (`<id>` is the frontmatter id). Copy `chains/castleloader-finger-hollowed-agent.json`, fill it in, run `python pipeline.py build`, and fix any `CHAIN WARNING` it prints.
    - Same facts as the post, nothing new. IOCs and ATT&CK IDs are copied from the post, defanged.
    - `nodes` are in attack order; that order is the step number. `phases` are ATT&CK tactics and become the section labels.
-   - `edges` say what leads to what. A step that doesn't follow the one above it is shown as "continues from NN".
+   - `edges` are the arrows: `[from, to]`, or `[from, to, "suspected"]` to override the colour. Keep them pointing right or down; an arrow back to an earlier column draws badly.
+   - Six columns is the most that fits. On phones the columns stack and the arrows are hidden, so the step numbers must read in order.
    - `confirmed` needs evidence in the post. Anything unproven is `suspected`, with a note saying what would confirm it. `impact` is the damage, `detected` is where a detection fired.
    - `label` under 25 characters, `sub` under 60. `icon` is a Font Awesome 6 solid name.
 4. `## What happened`: the story and what you found. Add one extra `##` section for the interesting part, if there is one.

@@ -106,55 +106,63 @@ def check_chain(post_id: str, chain: dict) -> None:
 
 
 def render_chain(post_id: str, chain: dict) -> str:
-    """One vertical flow in the article column: a numbered rail, one blob per step, details on click."""
+    """Tactic columns left to right, one blob per step, arrows drawn by js/writeups.js from data-edges."""
     check_chain(post_id, chain)
     e = html.escape
     nodes = chain["nodes"]
     index = {n["id"]: i for i, n in enumerate(nodes)}
     phases = {p["id"]: p for p in chain["phases"]}
-    incoming: dict[str, list[str]] = {}
-    for edge in chain["edges"]:
-        incoming.setdefault(edge[1], []).append(edge[0])
-
+    edges = [[x[0], x[1], x[2] if len(x) > 2 else nodes[index[x[1]]]["type"]] for x in chain["edges"]]
     kinds = list(dict.fromkeys(n["type"] for n in nodes))
-    out = ['<div class="chain">',
+
+    markers = "".join(
+        f'<marker id="chain-ah-{k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" '
+        f'orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="{c}"/></marker>'
+        for k, c in (("confirmed", "#00d4ff"), ("suspected", "#ffaa00"), ("impact", "#ff3366"), ("detected", "#00ffaa")))
+    out = [f'<div class="chain" data-edges="{e(json.dumps(edges))}">',
            '<div class="chain-legend">'
            + "".join(f'<span class="chain-key t-{k}">{TYPE_LABEL[k]}</span>' for k in kinds)
-           + '<span class="chain-hint">Click a step for evidence and IOCs</span></div>',
-           '<ol class="chain-steps">']
-    phase = None
-    for i, n in enumerate(nodes):
-        if n["phase"] != phase:
-            phase = n["phase"]
-            ph = phases[phase]
-            out.append(f'<li class="chain-phase"><span>{e(ph["name"])}</span><small>{e(ph.get("ta", ""))}</small></li>')
-        # A step that doesn't follow from the one above it says where it comes from.
-        sources = incoming.get(n["id"], [])
-        came_from = ""
-        if sources and nodes[i - 1]["id"] not in sources:
-            s = index[sources[0]]
-            came_from = f'<span class="chain-from">continues from {s + 1:02d} {e(nodes[s]["label"])}</span>'
-        badge = "" if n["type"] == "confirmed" else f'<span class="chain-badge">{TYPE_LABEL[n["type"]]}</span>'
-        tech = n.get("technique", "")
-        detail = [f'<p>{e(n["desc"])}</p>'] if n.get("desc") else []
-        if n.get("iocs"):
-            detail.append('<div class="chain-label">IOCs</div><ul class="chain-iocs">'
-                          + "".join(f"<li><code>{e(v)}</code></li>" for v in n["iocs"]) + "</ul>")
-        if n.get("notes"):
-            detail.append(f'<div class="chain-label">Confidence and gaps</div><p class="chain-note">{e(n["notes"])}</p>')
-        if tech:
-            url = "https://attack.mitre.org/techniques/" + tech.replace(".", "/") + "/"
-            detail.append(f'<p class="chain-mitre"><a href="{url}" target="_blank" rel="noopener">{e(tech)} on MITRE ATT&amp;CK</a></p>')
-        out.append(
-            f'<li class="chain-step t-{n["type"]}"><span class="chain-marker">{i + 1:02d}</span>'
-            f'<details class="chain-blob"><summary>'
-            f'<span class="chain-icon"><i class="fa-solid fa-{e(n.get("icon") or "circle")}"></i></span>'
-            f'<span class="chain-head"><span class="chain-title">{e(n["label"])}{badge}</span>'
-            f'<span class="chain-sub">{e(n.get("sub", ""))}</span>{came_from}</span>'
-            f'<span class="chain-tags">{f"<span class=chain-tech>{e(tech)}</span>" if tech else ""}'
-            f'<i class="fa-solid fa-chevron-down chain-chevron"></i></span>'
-            f'</summary><div class="chain-detail">{"".join(detail)}</div></details></li>')
-    out += ["</ol>", "</div>"]
+           + '<span class="chain-hint">Click a step to trace its path and see the evidence</span></div>',
+           f'<div class="chain-board"><svg class="chain-edges" aria-hidden="true"><defs>{markers}</defs><g></g></svg>']
+    details = []
+    for ph in chain["phases"]:
+        steps = [(i, n) for i, n in enumerate(nodes) if n["phase"] == ph["id"]]
+        if not steps:
+            continue
+        out.append(f'<div class="chain-col"><div class="chain-phase"><span>{e(ph["name"])}</span>'
+                   f'<small>{e(ph.get("ta", ""))}</small></div><div class="chain-col-body">')
+        for i, n in steps:
+            tech = n.get("technique", "")
+            badge = "" if n["type"] == "confirmed" else f'<span class="chain-badge">{TYPE_LABEL[n["type"]]}</span>'
+            foot = (f'<span class="chain-tech">{e(tech)}</span>' if tech else "") + badge
+            out.append(
+                f'<button type="button" class="chain-node t-{n["type"]}" data-id="{e(n["id"])}">'
+                f'<span class="chain-node-top"><span class="chain-icon"><i class="fa-solid fa-{e(n.get("icon") or "circle")}"></i></span>'
+                f'<span class="chain-num">{i + 1:02d}</span></span>'
+                f'<span class="chain-title">{e(n["label"])}</span>'
+                f'<span class="chain-sub">{e(n.get("sub", ""))}</span>'
+                + (f'<span class="chain-foot">{foot}</span>' if foot else "") + "</button>")
+
+            meta = e(phases[n["phase"]]["name"])
+            if tech:
+                url = "https://attack.mitre.org/techniques/" + tech.replace(".", "/") + "/"
+                meta += f' &middot; <a href="{url}" target="_blank" rel="noopener">{e(tech)}</a>'
+            body = [f'<div class="chain-panel-head"><span class="chain-badge">{TYPE_LABEL[n["type"]]}</span>'
+                    f'<span class="chain-panel-title">{i + 1:02d} // {e(n["label"])}</span>'
+                    f'<span class="chain-panel-meta">{meta}</span></div>']
+            if n.get("desc"):
+                body.append(f'<p>{e(n["desc"])}</p>')
+            if n.get("iocs"):
+                body.append('<div class="chain-label">IOCs</div><ul class="chain-iocs">'
+                            + "".join(f"<li><code>{e(v)}</code></li>" for v in n["iocs"]) + "</ul>")
+            if n.get("notes"):
+                body.append(f'<div class="chain-label">Confidence and gaps</div><p class="chain-note">{e(n["notes"])}</p>')
+            details.append(f'<div class="chain-data" data-for="{e(n["id"])}" data-type="{n["type"]}" hidden>{"".join(body)}</div>')
+        out.append("</div></div>")
+    out.append("</div>")
+    out += details
+    out.append('<div class="chain-panel" hidden></div>')
+    out.append("</div>")
     return "\n".join(out) + "\n"
 
 
