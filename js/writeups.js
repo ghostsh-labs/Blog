@@ -125,31 +125,32 @@
         function pathFor(a, b, base) {
             const ra = a.getBoundingClientRect();
             const rb = b.getBoundingClientRect();
-            const body = a.closest('.chain-col-body');
-            if (body === b.closest('.chain-col-body')) {
-                const sibs = [...body.children];
+            const row = a.closest('.chain-col-body');
+            if (row === b.closest('.chain-col-body')) {
+                const sibs = [...row.children];
                 if (Math.abs(sibs.indexOf(a) - sibs.indexOf(b)) === 1) {
-                    const down = ra.top < rb.top;
-                    const x1 = ra.left + ra.width / 2 - base.left;
-                    const y1 = (down ? ra.bottom : ra.top) - base.top;
-                    const x2 = rb.left + rb.width / 2 - base.left;
-                    const y2 = (down ? rb.top - 2 : rb.bottom + 2) - base.top;
-                    const dy = Math.max(8, Math.abs(y2 - y1) / 2) * (down ? 1 : -1);
-                    return `M${x1} ${y1} C${x1} ${y1 + dy},${x2} ${y2 - dy},${x2} ${y2}`;
+                    // neighbours in a row: straight across
+                    const right = ra.left < rb.left;
+                    const x1 = (right ? ra.right : ra.left) - base.left;
+                    const x2 = (right ? rb.left - 2 : rb.right + 2) - base.left;
+                    const y = Math.min(ra.top + ra.height / 2, rb.top + rb.height / 2) - base.top;
+                    return `M${x1} ${y} L${x2} ${y}`;
                 }
-                // something sits in between: bow out into the gutter on the left
-                const x1 = ra.left - base.left;
-                const y1 = ra.top + ra.height / 2 - base.top;
-                const x2 = rb.left - base.left - 2;
-                const y2 = rb.top + rb.height / 2 - base.top;
-                return `M${x1} ${y1} C${x1 - 22} ${y1},${x2 - 22} ${y2},${x2} ${y2}`;
+                // something sits in between: arc over the top of the row
+                const x1 = ra.left + ra.width / 2 - base.left;
+                const x2 = rb.left + rb.width / 2 - base.left;
+                const y1 = ra.top - base.top;
+                const y2 = rb.top - base.top - 2;
+                return `M${x1} ${y1} C${x1} ${y1 - 24},${x2} ${y2 - 24},${x2} ${y2}`;
             }
-            const x1 = ra.right - base.left;
-            const y1 = ra.top + ra.height / 2 - base.top;
-            const x2 = rb.left - base.left - 2;
-            const y2 = rb.top + rb.height / 2 - base.top;
-            const dx = Math.max(14, Math.abs(x2 - x1) / 2);
-            return `M${x1} ${y1} C${x1 + dx} ${y1},${x2 - dx} ${y2},${x2} ${y2}`;
+            // different rows: out of the bottom, into the top
+            const down = ra.top < rb.top;
+            const x1 = ra.left + ra.width / 2 - base.left;
+            const y1 = (down ? ra.bottom : ra.top) - base.top;
+            const x2 = rb.left + rb.width / 2 - base.left;
+            const y2 = (down ? rb.top - 2 : rb.bottom + 2) - base.top;
+            const dy = Math.max(12, Math.abs(y2 - y1) / 2) * (down ? 1 : -1);
+            return `M${x1} ${y1} C${x1} ${y1 + dy},${x2} ${y2 - dy},${x2} ${y2}`;
         }
 
         function draw() {
@@ -258,11 +259,6 @@
         let current = 0;
         heads.forEach((h, i) => { if (h.getBoundingClientRect().top < 130) current = i; });
         buttons.forEach((b, i) => b.classList.toggle('active', i === current));
-        // the chain is wider than the text, so the list steps aside while it scrolls past
-        const chain = document.querySelector('.writeup-body .chain');
-        const r = toc.firstElementChild.getBoundingClientRect();
-        const c = chain ? chain.getBoundingClientRect() : null;
-        toc.classList.toggle('is-covered', !!c && c.top < r.bottom + 12 && c.bottom > r.top - 12);
     }
 
     function initArticle(view) {

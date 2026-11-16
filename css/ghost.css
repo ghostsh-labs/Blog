@@ -1572,19 +1572,11 @@ footer {
 }
 
 /* Attack chain: rendered into the post by build_writeups.py from writeups/chains/<id>.json.
-   Tactic columns left to right, a blob per step, arrows drawn by js/writeups.js. */
+   One row per tactic, top to bottom; a blob per step; arrows drawn by js/writeups.js. */
 .writeup-body .chain {
     margin: 1.25rem 0 0.75rem;
     font-family: var(--font-mono);
     text-transform: none;
-}
-
-/* wider than the text column: it spans the article card */
-@media (min-width: 1000px) {
-    .writeup-body .chain {
-        margin-left: min(0px, calc((888px - min(1200px, 100vw)) / 2));
-        margin-right: min(0px, calc((888px - min(1200px, 100vw)) / 2));
-    }
 }
 
 .chain .t-confirmed { --c: #00d4ff; }
@@ -1624,9 +1616,8 @@ footer {
 .chain-board {
     position: relative;
     display: flex;
-    justify-content: center;
-    gap: 30px;
-    padding: 1rem 1.1rem 1.3rem;
+    flex-direction: column;
+    padding: 0.2rem 1rem;
     background: linear-gradient(180deg, rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.35));
     border: 1px solid var(--card-border);
     border-radius: 8px;
@@ -1671,26 +1662,27 @@ footer {
 .chain-col {
     position: relative;
     z-index: 1;
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: 230px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 0.9rem;
+    padding: 1.3rem 0;
+    border-top: 1px solid rgba(0, 212, 255, 0.07);
+}
+
+.chain-col:first-of-type {
+    border-top: 0;
 }
 
 .chain-phase {
-    min-height: 3.1rem;
+    flex: none;
+    width: 86px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    gap: 0.1rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 1px solid var(--card-border);
-    font-size: 0.64rem;
+    gap: 0.15rem;
+    font-size: 0.62rem;
     font-weight: 600;
     letter-spacing: 1px;
-    line-height: 1.3;
+    line-height: 1.35;
     text-transform: uppercase;
     color: var(--primary);
 }
@@ -1704,15 +1696,16 @@ footer {
 .chain-col-body {
     flex: 1;
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    gap: 1.15rem;
+    align-items: stretch;
+    gap: 26px;
 }
 
 /* the blobs */
 .chain-node {
     --c: var(--primary);
-    width: 100%;
+    flex: none;
+    width: 186px;
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
@@ -1915,18 +1908,19 @@ footer {
     color: var(--warning);
 }
 
-/* narrow screens: the columns stack and the arrows go; step numbers carry the order */
-@media (max-width: 999px) {
-    .chain-board { flex-direction: column; gap: 1.1rem; padding: 0.9rem; }
-    .chain-col { max-width: none; flex: none; }
-    .chain-phase { min-height: 0; flex-direction: row; align-items: baseline; justify-content: space-between; }
-    .chain-col-body { gap: 0.7rem; }
+/* narrow screens: blobs stack under their tactic and the arrows go; step numbers carry the order */
+@media (max-width: 899px) {
+    .chain-board { padding: 0.2rem 0.9rem; }
+    .chain-col { flex-direction: column; align-items: stretch; gap: 0.6rem; padding: 0.9rem 0; }
+    .chain-phase { width: auto; flex-direction: row; justify-content: space-between; align-items: baseline; }
+    .chain-col-body { flex-direction: column; gap: 0.7rem; }
+    .chain-node { width: 100%; }
     .chain-edges { display: none; }
     .chain-hint { margin-left: 0; flex-basis: 100%; }
     .chain-panel { margin: 0; }
 }
 
-/* "On this page", in the card's right margin on wide screens */
+/* "On this page", beside the article card on wide screens */
 .writeup-toc {
     display: none;
 }
@@ -1941,8 +1935,8 @@ footer {
         position: absolute;
         top: 0.5rem;
         bottom: 0;
-        left: calc(100% + 28px);
-        width: 128px;
+        left: calc(100% + 88px);
+        width: 112px;
         pointer-events: none;
     }
 
@@ -1954,11 +1948,6 @@ footer {
         gap: 0.1rem;
         pointer-events: auto;
         transition: opacity 0.2s ease;
-    }
-
-    .writeup-toc.is-covered .writeup-toc-inner {
-        opacity: 0;
-        pointer-events: none;
     }
 
     .writeup-toc-label {
@@ -2274,11 +2263,10 @@ body.reading .search-container {
     font-family: var(--font-mono);
 }
 
-/* the article card spans the page so the chain and the section list have room;
-   the text itself keeps a readable column */
+/* the article card hugs its text column instead of leaving wide empty margins */
 .writeup-article,
 #writeup-detail-view {
-    max-width: 1200px;
+    max-width: 900px;
 }
 
 .writeup-body {
