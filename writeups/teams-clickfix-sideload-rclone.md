@@ -29,7 +29,7 @@ TTC     : 36 min from first high-severity alert to isolation
 
 ## Attack Chain
 
-**[Open the interactive attack chain](teams-clickfix-sideload-rclone-chain.html)**: click a step for its evidence and IOCs.
+<!-- chain -->
 
 ```
 External Teams "help desk" → user pastes PowerShell one-liner

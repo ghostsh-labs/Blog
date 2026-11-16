@@ -1,4 +1,5 @@
 import hashlib
+import html
 import json
 import re
 from pathlib import Path
@@ -80,32 +81,108 @@ def md_to_html(body: str) -> str:
     )
 
 
-# The post's link line to its chain page, plus the text arrow diagram that follows it.
-CHAIN_LINK_RE = re.compile(
-    r'<p>(?:(?!</p>).)*?href="(writeups/[a-z0-9-]+-chain\.html)"(?:(?!</p>).)*?</p>\s*(<pre>.*?</pre>)?', re.DOTALL)
-CHAIN_EMBED = (
-    '<iframe class="chain-embed" src="{src}?embed=1" title="Interactive attack chain" '
-    "onload=\"try{{this.style.height=(this.contentDocument.querySelector('.container').offsetHeight+4)+'px'}}catch(e){{}}\"></iframe>\n"
-)
+CHAINS_DIR = WRITEUPS_DIR / "chains"
+TYPE_LABEL = {"confirmed": "Confirmed", "suspected": "Suspected", "impact": "Impact", "detected": "Detection"}
+# In the markdown, `<!-- chain -->` marks where the chain goes; the arrow diagram after it folds away.
+CHAIN_MARK_RE = re.compile(r"<!-- chain -->\s*(<pre>.*?</pre>)?", re.DOTALL)
 CHAIN_TEXT = '<details class="chain-text"><summary>Text version</summary>\n{pre}\n</details>\n'
 
 
-def embed_chain(html: str) -> str:
-    """Show the interactive chain inside the post itself; the arrow diagram folds away under it."""
+def check_chain(post_id: str, chain: dict) -> None:
+    ids = [n["id"] for n in chain["nodes"]]
+    phases = {p["id"] for p in chain["phases"]}
+    problems = [f"duplicate step id {i}" for i in set(ids) if ids.count(i) > 1]
+    for n in chain["nodes"]:
+        if n["phase"] not in phases:
+            problems.append(f"{n['id']}: unknown phase {n['phase']}")
+        if n["type"] not in TYPE_LABEL:
+            problems.append(f"{n['id']}: unknown type {n['type']}")
+        if len(n["label"]) > 25 or len(n.get("sub", "")) > 60:
+            problems.append(f"{n['id']}: label over 25 or sub over 60 characters")
+    for edge in chain["edges"]:
+        problems += [f"edge names unknown step {x}" for x in edge[:2] if x not in ids]
+    for msg in problems:
+        print(f"CHAIN WARNING {post_id}: {msg}")
+
+
+def render_chain(post_id: str, chain: dict) -> str:
+    """One vertical flow in the article column: a numbered rail, one blob per step, details on click."""
+    check_chain(post_id, chain)
+    e = html.escape
+    nodes = chain["nodes"]
+    index = {n["id"]: i for i, n in enumerate(nodes)}
+    phases = {p["id"]: p for p in chain["phases"]}
+    incoming: dict[str, list[str]] = {}
+    for edge in chain["edges"]:
+        incoming.setdefault(edge[1], []).append(edge[0])
+
+    kinds = list(dict.fromkeys(n["type"] for n in nodes))
+    out = ['<div class="chain">',
+           '<div class="chain-legend">'
+           + "".join(f'<span class="chain-key t-{k}">{TYPE_LABEL[k]}</span>' for k in kinds)
+           + '<span class="chain-hint">Click a step for evidence and IOCs</span></div>',
+           '<ol class="chain-steps">']
+    phase = None
+    for i, n in enumerate(nodes):
+        if n["phase"] != phase:
+            phase = n["phase"]
+            ph = phases[phase]
+            out.append(f'<li class="chain-phase"><span>{e(ph["name"])}</span><small>{e(ph.get("ta", ""))}</small></li>')
+        # A step that doesn't follow from the one above it says where it comes from.
+        sources = incoming.get(n["id"], [])
+        came_from = ""
+        if sources and nodes[i - 1]["id"] not in sources:
+            s = index[sources[0]]
+            came_from = f'<span class="chain-from">continues from {s + 1:02d} {e(nodes[s]["label"])}</span>'
+        badge = "" if n["type"] == "confirmed" else f'<span class="chain-badge">{TYPE_LABEL[n["type"]]}</span>'
+        tech = n.get("technique", "")
+        detail = [f'<p>{e(n["desc"])}</p>'] if n.get("desc") else []
+        if n.get("iocs"):
+            detail.append('<div class="chain-label">IOCs</div><ul class="chain-iocs">'
+                          + "".join(f"<li><code>{e(v)}</code></li>" for v in n["iocs"]) + "</ul>")
+        if n.get("notes"):
+            detail.append(f'<div class="chain-label">Confidence and gaps</div><p class="chain-note">{e(n["notes"])}</p>')
+        if tech:
+            url = "https://attack.mitre.org/techniques/" + tech.replace(".", "/") + "/"
+            detail.append(f'<p class="chain-mitre"><a href="{url}" target="_blank" rel="noopener">{e(tech)} on MITRE ATT&amp;CK</a></p>')
+        out.append(
+            f'<li class="chain-step t-{n["type"]}"><span class="chain-marker">{i + 1:02d}</span>'
+            f'<details class="chain-blob"><summary>'
+            f'<span class="chain-icon"><i class="fa-solid fa-{e(n.get("icon") or "circle")}"></i></span>'
+            f'<span class="chain-head"><span class="chain-title">{e(n["label"])}{badge}</span>'
+            f'<span class="chain-sub">{e(n.get("sub", ""))}</span>{came_from}</span>'
+            f'<span class="chain-tags">{f"<span class=chain-tech>{e(tech)}</span>" if tech else ""}'
+            f'<i class="fa-solid fa-chevron-down chain-chevron"></i></span>'
+            f'</summary><div class="chain-detail">{"".join(detail)}</div></details></li>')
+    out += ["</ol>", "</div>"]
+    return "\n".join(out) + "\n"
+
+
+def embed_chain(post_id: str, page: str) -> str:
+    """Swap the post's chain marker for the rendered chain; the arrow diagram folds away under it."""
+    src = CHAINS_DIR / f"{post_id}.json"
+
     def repl(m: re.Match[str]) -> str:
-        out = CHAIN_EMBED.format(src=m.group(1))
-        return out + (CHAIN_TEXT.format(pre=m.group(2)) if m.group(2) else "")
-    return CHAIN_LINK_RE.sub(repl, html, count=1)
+        if not src.exists():
+            print(f"CHAIN WARNING {post_id}: no chains/{post_id}.json, showing the text diagram only")
+            return m.group(1) or ""
+        chain = render_chain(post_id, json.loads(src.read_text(encoding="utf-8")))
+        return chain + (CHAIN_TEXT.format(pre=m.group(1)) if m.group(1) else "")
+    return CHAIN_MARK_RE.sub(repl, page, count=1)
 
 
-def stamp_data_version(content: str) -> None:
-    """Point the pages at a fresh ?v= so browsers don't keep showing the old post data."""
-    version = hashlib.sha1(content.encode("utf-8")).hexdigest()[:8]
-    for page in BASE.glob("*.html"):
-        text = page.read_text(encoding="utf-8")
-        new = re.sub(r"js/writeups-data\.js(\?v=[\w.-]*)?", f"js/writeups-data.js?v={version}", text)
-        if new != text:
-            page.write_text(new, encoding="utf-8", newline="\n")
+def stamp_versions() -> None:
+    """Give the pages a fresh ?v= for each asset so browsers don't keep showing old data, styles or scripts."""
+    for asset in ("js/writeups-data.js", "js/writeups.js", "js/home.js", "css/ghost.css"):
+        version = hashlib.sha1((BASE / asset).read_bytes()).hexdigest()[:8]
+        pattern = re.compile(re.escape(asset) + r"(\?v=[\w.-]*)?")
+        for page in BASE.glob("*.html"):
+            if page.name == "attack-chain.html":
+                continue
+            text = page.read_text(encoding="utf-8")
+            new = pattern.sub(f"{asset}?v={version}", text)
+            if new != text:
+                page.write_text(new, encoding="utf-8", newline="\n")
 
 
 def load_writeup(path: Path) -> dict:
@@ -122,9 +199,10 @@ def load_writeup(path: Path) -> dict:
         "readTime": meta.get("readTime", estimate_read_time(body)),
         "tags": meta.get("tags", []),
         # Posts link images relative to writeups/, but they render on writeups.html at the root.
-        # Same for the interactive chain pages (writeups/<id>-chain.html).
-        "content": embed_chain(re.sub(r'(src|href)="(assets/|[a-z0-9-]+-chain\.html")', r'\1="writeups/\2', md_to_html(body))),
+        "content": re.sub(r'(src|href)="assets/', r'\1="writeups/assets/', md_to_html(body)),
     }
+
+    writeup["content"] = embed_chain(writeup["id"], writeup["content"])
 
     if not writeup["summary"]:
         for line in body.splitlines():
@@ -159,7 +237,7 @@ def main() -> None:
 
     content = "window.GHOST_WRITEUPS = " + json.dumps(writeups, indent=2, ensure_ascii=False) + ";\n"
     OUTPUT.write_text(content, encoding="utf-8")
-    stamp_data_version(content)
+    stamp_versions()
     update_readme_index(writeups)
     print(f"Built {OUTPUT.name} with {len(writeups)} writeup(s)")
 

@@ -1,0 +1,174 @@
+{
+  "title": "CastleRat Delivery Chain",
+  "subtitle": "A fake CAPTCHA paste pulls a scheduled task over SMB and ends in a CastleRat implant that finds its C2 in a Steam profile name.",
+  "meta": [
+    {
+      "k": "Source",
+      "v": "Sanitized case and sandbox run"
+    },
+    {
+      "k": "Family",
+      "v": "CastleRat / NightShadeC2"
+    },
+    {
+      "k": "Published",
+      "v": "2026-10-02"
+    },
+    {
+      "k": "C2",
+      "v": "Steam dead drop"
+    }
+  ],
+  "phases": [
+    {
+      "id": "ex",
+      "name": "Execution",
+      "ta": "TA0002"
+    },
+    {
+      "id": "de",
+      "name": "Defense Evasion",
+      "ta": "TA0005"
+    },
+    {
+      "id": "pe",
+      "name": "Priv Escalation",
+      "ta": "TA0004"
+    },
+    {
+      "id": "c2",
+      "name": "Command & Control",
+      "ta": "TA0011"
+    },
+    {
+      "id": "ca",
+      "name": "Credential Access",
+      "ta": "TA0006"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "paste",
+      "phase": "ex",
+      "type": "confirmed",
+      "icon": "paste",
+      "label": "Fake CAPTCHA paste",
+      "sub": "Win+R one-liner dressed up as CAPTCHA text",
+      "technique": "T1204.004",
+      "desc": "The paste stored guest creds for an attacker SMB share and created a scheduled task from an XML file on that share. A trailing REM I am not a robot comment made it look like CAPTCHA text.",
+      "notes": "High: the command survived in endpoint telemetry. The lure page itself wasn't preserved."
+    },
+    {
+      "id": "task",
+      "phase": "ex",
+      "type": "confirmed",
+      "icon": "calendar-check",
+      "label": "Task from an SMB share",
+      "sub": "cmdkey, then schtasks /XML from a UNC path",
+      "technique": "T1053.005",
+      "desc": "The task, Lowks, is created from full.xml on the attacker's share. Keeping the task on the share lets the operator change what it runs without touching the lure.",
+      "iocs": [
+        "195.10.205[.]171",
+        "\\\\195.10.205[.]171\\kxc\\full.xml",
+        "Scheduled task \"Lowks\""
+      ]
+    },
+    {
+      "id": "stager",
+      "phase": "ex",
+      "type": "confirmed",
+      "icon": "terminal",
+      "label": "Junk-padded stager",
+      "sub": "Hundreds of dead lines around one real function",
+      "technique": "T1059.001",
+      "desc": "The task pulls a PowerShell stager. It's mostly hundreds of lines of dead code to dilute AMSI, with one real function that downloads maestrovsd.exe, a .NET loader of about 150 KB.",
+      "iocs": [
+        "yhofgafjle[.]com",
+        "e25534efbab99f08ca802c6d3974c2ff7c47ddd6e6ed71a84a94c2fddd7de4e2",
+        "C:\\Windows\\Temp\\TrHtWFGyRY.exe"
+      ],
+      "notes": "The variable names look randomized per deployment, so don't hunt on them."
+    },
+    {
+      "id": "python",
+      "phase": "de",
+      "type": "confirmed",
+      "icon": "box-open",
+      "label": "Brings its own Python",
+      "sub": "Signed pythonw.exe runs attacker .pyc files",
+      "technique": "T1027",
+      "desc": "The loader fetches full signed Python runtimes (3.9 and 3.13) plus install.pyc and melody.pyc, so the process tree shows a trusted pythonw.exe running attacker bytecode. The Python is PyArmor-protected, so static analysis of the .pyc files went nowhere.",
+      "iocs": [
+        "162.33.177[.]16",
+        "adamcold[.]com",
+        "b953bb0acb76848f889909256d67d01d44cc45d83c8bfc3421783ac0a79688fc",
+        "91919832f20d8fb78bab82844a430ecbe02a07df3f317316a8c34f54e3bb45c2",
+        "C:\\ProgramData\\5171NWNrWQ\\",
+        "C:\\ProgramData\\92WKzFYLqB\\"
+      ]
+    },
+    {
+      "id": "uac",
+      "phase": "pe",
+      "type": "confirmed",
+      "icon": "arrow-up-right-dots",
+      "label": "UAC bypass",
+      "sub": "pythonw.exe starts ComputerDefaults.exe at High",
+      "technique": "T1548.002",
+      "desc": "pythonw.exe spawned ComputerDefaults.exe at High integrity, which fits the ms-settings handler hijack.",
+      "notes": "High on the process chain. I treated the registry rewrite as part of the technique rather than something I observed on its own."
+    },
+    {
+      "id": "steam",
+      "phase": "c2",
+      "type": "confirmed",
+      "icon": "gamepad",
+      "label": "Steam dead drop",
+      "sub": "C2 read from a Steam profile name, in plain text",
+      "technique": "T1102.001",
+      "desc": "The implant doesn't hardcode its C2. It fetches a Steam Community profile and reads the C2 straight out of the profile name. Steam traffic rarely gets blocked, and swapping infrastructure is just editing a profile. Config extraction also gave an RC4 key that decrypts two more in-memory stages.",
+      "iocs": [
+        "steamcommunity[.]com/id/dpmorin49sdiw302fw",
+        "45.88.106[.]190:4545",
+        "8.3.0[.]253"
+      ],
+      "notes": "Family is Medium confidence: it rests on the sandbox verdict, YARA hits and infrastructure overlap, not a code comparison."
+    },
+    {
+      "id": "steal",
+      "phase": "ca",
+      "type": "impact",
+      "icon": "key",
+      "label": "Stealer and RAT",
+      "sub": "Browsers, wallets, password managers, screenshots",
+      "technique": "T1555.003",
+      "desc": "Once it's up, it's a full stealer: Chrome, Edge and Firefox data, a long list of crypto wallets and wallet extensions, 1Password and NordPass directories, VPN configs, FTP clients, and screenshots."
+    }
+  ],
+  "edges": [
+    [
+      "paste",
+      "task"
+    ],
+    [
+      "task",
+      "stager"
+    ],
+    [
+      "stager",
+      "python"
+    ],
+    [
+      "python",
+      "uac"
+    ],
+    [
+      "uac",
+      "steam"
+    ],
+    [
+      "steam",
+      "steal"
+    ]
+  ]
+}

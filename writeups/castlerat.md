@@ -28,7 +28,7 @@ IMPACT  : Stealer + RAT: browsers, wallets, password managers, screenshots
 
 ## Attack Chain
 
-**[Open the interactive attack chain](castle-rat-delivery-chain.html)**: click a step for its evidence and IOCs.
+<!-- chain -->
 
 ```
 CAPTCHA paste → cmd.exe

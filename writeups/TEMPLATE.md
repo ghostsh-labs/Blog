@@ -37,15 +37,14 @@ Same order every post. Drop a section if it doesn't apply; don't rename it.
    IMPACT  :
    ```
    Optional `TTC` line only with real timestamps.
-3. `## Attack Chain`: the chain link line, then the arrow diagram, kept tight. On the site the build swaps the link line for the interactive chain, shown inside the post, and folds the arrow diagram under "Text version".
-   ```
-   **[Open the interactive attack chain](<id>-chain.html)**: click a step for its evidence and IOCs.
-   ```
-   Copy `chains/castleloader-finger-hollowed-agent.js` to `chains/<id>.js` (`<id>` is the frontmatter id), fill it in, run `python make_chain.py <id> --check` inside `blog\`. It must report no errors. (An id that already ends in `-chain` builds `<id>.html`, not `<id>-chain.html`.)
+3. `## Attack Chain`: the line `<!-- chain -->`, then the arrow diagram, kept tight.
+   The site build replaces the marker with the visual chain (a vertical flow inside the post, one step per blob, click for evidence) and folds the arrow diagram under "Text version". On GitHub only the arrow diagram shows.
+   Chain data is `chains/<id>.json` (`<id>` is the frontmatter id). Copy `chains/castleloader-finger-hollowed-agent.json`, fill it in, run `python pipeline.py build`, and fix any `CHAIN WARNING` it prints.
    - Same facts as the post, nothing new. IOCs and ATT&CK IDs are copied from the post, defanged.
-   - Columns are ATT&CK tactics, left to right in the order it happened. Steps are numbered in list order.
+   - `nodes` are in attack order; that order is the step number. `phases` are ATT&CK tactics and become the section labels.
+   - `edges` say what leads to what. A step that doesn't follow the one above it is shown as "continues from NN".
    - `confirmed` needs evidence in the post. Anything unproven is `suspected`, with a note saying what would confirm it. `impact` is the damage, `detected` is where a detection fired.
-   - `label` under 25 characters, `sub` under 60.
+   - `label` under 25 characters, `sub` under 60. `icon` is a Font Awesome 6 solid name.
 4. `## What happened`: the story and what you found. Add one extra `##` section for the interesting part, if there is one.
 5. `## Timeline`: only with real timestamps, in a code block, as `T+7 min` / `T+6 h 20 min`. Say what T is.
 6. `## How I know`: 3-5 bullets. Each one: evidence, tool or data source, finding, confidence. Confidence is `High`, `Medium` or `Low`; write `Open:` for what you couldn't answer.
