@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GHOST - Attack chain: CastleRat Delivery Chain</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>if(new URLSearchParams(location.search).has("embed"))document.documentElement.classList.add("embed")</script>
 <link rel="stylesheet" href="../css/ghost.css">
 <style>
 /* site overrides: keep evidence in its real case */
@@ -12,6 +13,10 @@
 .meta-chip b{text-transform:uppercase}
 .detail .prompt::before{content:none}
 .container{max-width:1520px}
+/* ?embed=1: just the chain, for the iframe inside the post */
+.embed .navbar,.embed .chain-hero,.embed footer,.embed .cyber-grid,.embed .scanlines,.embed #btnEdit{display:none}
+.embed body{background:var(--card);min-height:0;animation:none;opacity:1}
+.embed .container{margin:0;padding:.9rem .9rem .4rem;max-width:none}
 
 /* ===================== ATTACK CHAIN ===================== */
 .chain-hero{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:1.75rem 2rem;margin-bottom:1.25rem;box-shadow:0 4px 30px rgba(0,0,0,.4)}

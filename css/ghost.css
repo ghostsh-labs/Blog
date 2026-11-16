@@ -1566,6 +1566,36 @@ footer {
     margin: 1.5rem 0;
 }
 
+/* Interactive attack chain, wider than the text column */
+.writeup-body .chain-embed {
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1500px, calc(100vw - 2rem));
+    height: 620px;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    background: var(--card);
+    margin: 1rem 0 0.75rem;
+}
+
+.writeup-body .chain-text {
+    margin: 0 0 1rem;
+}
+
+.writeup-body .chain-text summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+}
+
+.writeup-body .chain-text summary:hover {
+    color: var(--primary);
+}
+
 .writeup-body img {
     max-width: 100%;
     border: 1px solid var(--card-border);

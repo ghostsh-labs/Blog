@@ -1,3 +1,4 @@
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -79,6 +80,34 @@ def md_to_html(body: str) -> str:
     )
 
 
+# The post's link line to its chain page, plus the text arrow diagram that follows it.
+CHAIN_LINK_RE = re.compile(
+    r'<p>(?:(?!</p>).)*?href="(writeups/[a-z0-9-]+-chain\.html)"(?:(?!</p>).)*?</p>\s*(<pre>.*?</pre>)?', re.DOTALL)
+CHAIN_EMBED = (
+    '<iframe class="chain-embed" src="{src}?embed=1" title="Interactive attack chain" '
+    "onload=\"try{{this.style.height=(this.contentDocument.querySelector('.container').offsetHeight+4)+'px'}}catch(e){{}}\"></iframe>\n"
+)
+CHAIN_TEXT = '<details class="chain-text"><summary>Text version</summary>\n{pre}\n</details>\n'
+
+
+def embed_chain(html: str) -> str:
+    """Show the interactive chain inside the post itself; the arrow diagram folds away under it."""
+    def repl(m: re.Match[str]) -> str:
+        out = CHAIN_EMBED.format(src=m.group(1))
+        return out + (CHAIN_TEXT.format(pre=m.group(2)) if m.group(2) else "")
+    return CHAIN_LINK_RE.sub(repl, html, count=1)
+
+
+def stamp_data_version(content: str) -> None:
+    """Point the pages at a fresh ?v= so browsers don't keep showing the old post data."""
+    version = hashlib.sha1(content.encode("utf-8")).hexdigest()[:8]
+    for page in BASE.glob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        new = re.sub(r"js/writeups-data\.js(\?v=[\w.-]*)?", f"js/writeups-data.js?v={version}", text)
+        if new != text:
+            page.write_text(new, encoding="utf-8", newline="\n")
+
+
 def load_writeup(path: Path) -> dict:
     raw = path.read_text(encoding="utf-8")
     meta, body = parse_frontmatter(raw)
@@ -94,7 +123,7 @@ def load_writeup(path: Path) -> dict:
         "tags": meta.get("tags", []),
         # Posts link images relative to writeups/, but they render on writeups.html at the root.
         # Same for the interactive chain pages (writeups/<id>-chain.html).
-        "content": re.sub(r'(src|href)="(assets/|[a-z0-9-]+-chain\.html")', r'\1="writeups/\2', md_to_html(body)),
+        "content": embed_chain(re.sub(r'(src|href)="(assets/|[a-z0-9-]+-chain\.html")', r'\1="writeups/\2', md_to_html(body))),
     }
 
     if not writeup["summary"]:
@@ -130,6 +159,7 @@ def main() -> None:
 
     content = "window.GHOST_WRITEUPS = " + json.dumps(writeups, indent=2, ensure_ascii=False) + ";\n"
     OUTPUT.write_text(content, encoding="utf-8")
+    stamp_data_version(content)
     update_readme_index(writeups)
     print(f"Built {OUTPUT.name} with {len(writeups)} writeup(s)")
 

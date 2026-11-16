@@ -37,7 +37,7 @@ Same order every post. Drop a section if it doesn't apply; don't rename it.
    IMPACT  :
    ```
    Optional `TTC` line only with real timestamps.
-3. `## Attack Chain`: the link to the interactive chain, then the arrow diagram, kept tight.
+3. `## Attack Chain`: the chain link line, then the arrow diagram, kept tight. On the site the build swaps the link line for the interactive chain, shown inside the post, and folds the arrow diagram under "Text version".
    ```
    **[Open the interactive attack chain](<id>-chain.html)**: click a step for its evidence and IOCs.
    ```

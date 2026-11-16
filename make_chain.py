@@ -33,8 +33,14 @@ OVERRIDES = (
     ".chain-hero .subtitle,.meta-chip,.node,.detail,.editor,.hint{text-transform:none}\n"
     ".meta-chip b{text-transform:uppercase}\n"
     ".detail .prompt::before{content:none}\n"
-    ".container{max-width:%dpx}\n\n"
+    ".container{max-width:%dpx}\n"
+    "/* ?embed=1: just the chain, for the iframe inside the post */\n"
+    ".embed .navbar,.embed .chain-hero,.embed footer,.embed .cyber-grid,.embed .scanlines,.embed #btnEdit{display:none}\n"
+    ".embed body{background:var(--card);min-height:0;animation:none;opacity:1}\n"
+    ".embed .container{margin:0;padding:.9rem .9rem .4rem;max-width:none}\n\n"
 )
+EMBED_JS = ('<script>if(new URLSearchParams(location.search).has("embed"))'
+            'document.documentElement.classList.add("embed")</script>\n')
 
 
 def sub_once(pattern: str, repl: str, text: str, what: str) -> str:
@@ -59,7 +65,7 @@ def build(post_id: str) -> Path:
     html = sub_once(r"/\* =+ GHOST BASE.*?(?=/\* =+ ATTACK CHAIN)", OVERRIDES % (cols * 298 + 30),
                     html, "GHOST BASE css block")
     html = sub_once(r"<!--\s*TEMPLATE NOTES.*?-->\n", "", html, "template notes")
-    html = sub_once(r"<style>", '<link rel="stylesheet" href="../css/ghost.css">\n<style>', html, "<style>")
+    html = sub_once(r"<style>", EMBED_JS + '<link rel="stylesheet" href="../css/ghost.css">\n<style>', html, "<style>")
     html = sub_once(r"<title>.*?</title>",
                     f"<title>GHOST - Attack chain: {title.group(1) if title else post_id}</title>", html, "<title>")
     html = sub_once(r'<nav class="navbar">.*?</nav>', NAV, html, "navbar")
